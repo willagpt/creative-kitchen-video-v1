@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
+import type { Clip } from '@/types';
 import { useStore } from '@/store';
 import { ClipCard } from '@/components/ClipCard';
 import { Dropdown } from '@/components/Dropdown';
 import { getThumbnailFiles } from '@/lib/drive';
+import { supabase } from '@/lib/supabase';
 import { Film, Grid3X3, List } from 'lucide-react';
 
 export function Shots() {
@@ -13,6 +15,9 @@ export function Shots() {
     fetchClips,
     setThumbnailMap,
     setActiveTab,
+    selectedClips,
+    clearSelection,
+    updateClip,
   } = useStore();
 
   // Filter state
@@ -36,6 +41,27 @@ export function Shots() {
         .catch((err) => console.error('Failed to load thumbnails:', err));
     }
   }, [workspace, fetchClips, setThumbnailMap]);
+
+  useEffect(() => {
+    if (!workspace) return;
+    const channel = supabase
+      .channel('clips-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'clips',
+        filter: `workspace_id=eq.${workspace.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'UPDATE') {
+          updateClip(payload.new.id, payload.new as Partial<Clip>);
+        } else if (payload.eventType === 'INSERT') {
+          fetchClips(workspace.id);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [workspace, updateClip, fetchClips]);
 
   // Generate dropdown options from clips data
   const typeOptions = useMemo(() => {
@@ -256,8 +282,26 @@ export function Shots() {
           placeholder="Hide Archived"
         />
 
-        {/* Right side: View controls and clip count */}
+        {/* Right side: Bulk actions and view controls */}
         <div className="ml-auto flex items-center gap-2">
+          {selectedClips.size > 0 && (
+            <>
+              <span className="text-xs text-indigo-400 font-medium">{selectedClips.size} selected</span>
+              <button
+                onClick={clearSelection}
+                className="text-[10px] text-zinc-500 hover:text-zinc-300"
+              >
+                Clear
+              </button>
+              <button className="px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded">
+                Archive
+              </button>
+              <button className="px-2 py-1 text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded">
+                Delete
+              </button>
+              <div className="w-px h-4 bg-zinc-700" />
+            </>
+          )}
           <button className="w-8 h-8 rounded-md bg-indigo-600 text-white flex items-center justify-center">
             <Grid3X3 className="w-4 h-4" />
           </button>

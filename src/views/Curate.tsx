@@ -22,6 +22,30 @@ export function Curate() {
 
   // Get first pending clip for display
   const firstPendingClip = clips.find((c) => !c.approved && !c.rejected && !c.archived);
+  const pendingClips = clips.filter((c) => !c.approved && !c.rejected && !c.archived);
+  const currentClipIndex = pendingClips.indexOf(firstPendingClip || pendingClips[0]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      switch (e.key.toLowerCase()) {
+        case 'a':
+          e.preventDefault();
+          handleApprove();
+          break;
+        case 'r':
+          e.preventDefault();
+          handleReject();
+          break;
+        case 's':
+          e.preventDefault();
+          handleSkip();
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentClipIndex, pendingClips]);
 
   const handleApprove = async () => {
     if (!firstPendingClip) return;
@@ -237,19 +261,19 @@ export function Curate() {
                 onClick={handleApprove}
                 className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-colors"
               >
-                Approve
+                Approve <span className="text-xs ml-1 text-emerald-200">[A]</span>
               </button>
               <button
                 onClick={handleReject}
                 className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
               >
-                Reject
+                Reject <span className="text-xs ml-1 text-zinc-500">[R]</span>
               </button>
               <button
                 onClick={handleSkip}
                 className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
               >
-                Skip
+                Skip <span className="text-xs ml-1 text-zinc-500">[S]</span>
               </button>
             </div>
           </div>

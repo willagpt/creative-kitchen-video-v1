@@ -1,4 +1,6 @@
 import type { Clip } from '@/types';
+import { useStore } from '@/store';
+import { Check } from 'lucide-react';
 
 const TYPE_BADGE_COLORS: Record<string, string> = {
   body: 'bg-indigo-600',
@@ -14,7 +16,8 @@ interface ClipCardProps {
 }
 
 export function ClipCard({ clip }: ClipCardProps) {
-  // Note: selectedClips and toggleSelectClip removed - not used in this design
+  const { selectedClips, toggleSelectClip } = useStore();
+  const isSelected = selectedClips.has(clip.id);
 
   const formatDuration = (seconds: number): string => {
     return `${seconds.toFixed(1)}s`;
@@ -44,12 +47,34 @@ export function ClipCard({ clip }: ClipCardProps) {
   const typeBgColor = TYPE_BADGE_COLORS[clipType] || 'bg-zinc-700';
 
   return (
-    <div className="group relative bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden cursor-pointer transition-all hover:border-indigo-500/50">
+    <div
+      className={`group relative bg-zinc-900 border rounded-lg overflow-hidden cursor-pointer transition-all ${
+        isSelected
+          ? 'ring-1 ring-indigo-500 border-indigo-500'
+          : 'border-zinc-800 hover:border-indigo-500/50'
+      }`}
+      onClick={() => toggleSelectClip(clip.id)}
+    >
       {/* Thumbnail Area */}
       <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-zinc-700/50 to-zinc-800 rounded-t-lg flex items-center justify-center">
         {/* Faint clip name text */}
         <div className="absolute inset-0 flex items-center justify-center text-[10px] text-zinc-600 px-2 text-center">
           <span className="line-clamp-1">{clip.name}</span>
+        </div>
+
+        {/* Selection checkbox - TOP-LEFT */}
+        <div
+          className={`absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded border flex items-center justify-center transition-opacity ${
+            isSelected
+              ? 'bg-indigo-500 border-indigo-500 opacity-100'
+              : 'border-zinc-500 bg-black/30 opacity-0 group-hover:opacity-100'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleSelectClip(clip.id);
+          }}
+        >
+          {isSelected && <Check className="w-3 h-3 text-white" />}
         </div>
 
         {/* TYPE Badge - TOP-LEFT */}
@@ -75,6 +100,19 @@ export function ClipCard({ clip }: ClipCardProps) {
             {formatDuration(clip.duration)}
           </div>
         )}
+
+        {/* Hover overlay with actions */}
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+          <button className="px-2 py-1 text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded transition-colors">
+            Manage
+          </button>
+          <button className="px-2 py-1 text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded transition-colors">
+            Archive
+          </button>
+          <button className="px-2 py-1 text-[10px] font-medium bg-red-600/80 hover:bg-red-600 text-white rounded transition-colors">
+            Delete
+          </button>
+        </div>
       </div>
 
       {/* Text Area — V1: p-2, 2 lines: text-xs text-zinc-300 + text-[10px] text-zinc-600 */}
