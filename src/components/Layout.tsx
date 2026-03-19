@@ -4,7 +4,6 @@ import { useStore } from '@/store';
 import { supabase } from '@/lib/supabase';
 import { LogOut } from 'lucide-react';
 
-// Match original app's nav structure exactly
 const navItems = [
   { id: 'shots', label: 'Shots', path: '/shots', step: '1', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
   { id: 'curate', label: 'Curate', path: '/curate', step: '2', icon: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z', disabled: true },
@@ -16,7 +15,19 @@ const navItems = [
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { activeTab, setActiveTab, user } = useStore();
+  const {
+    activeTab,
+    setActiveTab,
+    user,
+    showCuratedOnly,
+    setShowCuratedOnly,
+    showGradedOnly,
+    setShowGradedOnly,
+    showMusic,
+    setShowMusic,
+    columnCount,
+    setColumnCount,
+  } = useStore();
   const navigate = useNavigate();
 
   const handleNav = (item: typeof navItems[0]) => {
@@ -29,10 +40,16 @@ export function Layout({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const handleStaticToolClick = () => {
+    const pinModal = document.getElementById('ck-pin') as HTMLDivElement | null;
+    if (pinModal) {
+      pinModal.style.display = 'flex';
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
-      {/* Header — matches original: h-11, bg-zinc-900/80, backdrop-blur */}
-      <header className="h-11 flex items-center justify-between px-4 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur shrink-0">
+      <header className="h-11 flex items-center justify-between px-4 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex-shrink-0">
         {/* Left: Brand */}
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold tracking-tight text-zinc-100">Creative Kitchen</span>
@@ -41,7 +58,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </span>
         </div>
 
-        {/* Center: Tab Navigation — original style with step numbers + SVG icons */}
+        {/* Center: Tab Navigation */}
         <nav className="flex gap-0.5">
           {navItems.map((item) => {
             const active = activeTab === item.id;
@@ -89,14 +106,68 @@ export function Layout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Right: User */}
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] text-zinc-500 max-w-[160px] truncate">
+        {/* Right: Controls & User */}
+        <div className="flex items-center gap-2">
+          {/* Checkboxes */}
+          <label className="flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-300 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors">
+            <input
+              type="checkbox"
+              checked={showCuratedOnly}
+              onChange={(e) => setShowCuratedOnly(e.target.checked)}
+              className="w-4 h-4 rounded border-zinc-600 cursor-pointer"
+            />
+            <span>Curated only</span>
+          </label>
+
+          <label className="flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-300 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors">
+            <input
+              type="checkbox"
+              checked={showGradedOnly}
+              onChange={(e) => setShowGradedOnly(e.target.checked)}
+              className="w-4 h-4 rounded border-zinc-600 cursor-pointer"
+            />
+            <span>Graded only</span>
+          </label>
+
+          <label className="flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-300 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors">
+            <input
+              type="checkbox"
+              checked={showMusic}
+              onChange={(e) => setShowMusic(e.target.checked)}
+              className="w-4 h-4 rounded border-zinc-600 cursor-pointer"
+            />
+            <span>Music</span>
+          </label>
+
+          {/* Column slider */}
+          <div className="flex items-center gap-1 px-2">
+            <label className="text-[10px] text-zinc-400">Cols:</label>
+            <input
+              type="range"
+              min="2"
+              max="10"
+              value={columnCount}
+              onChange={(e) => setColumnCount(parseInt(e.target.value, 10))}
+              className="w-16 h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-indigo-500"
+            />
+            <span className="text-[10px] text-zinc-400 w-5 text-right">{columnCount}</span>
+          </div>
+
+          {/* Static Tool button */}
+          <button
+            onClick={handleStaticToolClick}
+            className="inline-flex gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-medium bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 hover:bg-yellow-600/20 transition-colors"
+          >
+            Static Tool
+          </button>
+
+          {/* User controls */}
+          <span className="text-[10px] text-zinc-500 max-w-[140px] truncate">
             {user?.email}
           </span>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors p-1"
             title="Sign out"
           >
             <LogOut className="w-3 h-3" />

@@ -1,14 +1,5 @@
-import { Check, X, Clock } from 'lucide-react';
 import type { Clip } from '@/types';
 import { useStore } from '@/store';
-
-const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  'food-action': { bg: 'bg-orange-600/30', text: 'text-orange-300' },
-  'food-beauty': { bg: 'bg-yellow-600/30', text: 'text-yellow-300' },
-  'lifestyle': { bg: 'bg-purple-600/30', text: 'text-purple-300' },
-  'product': { bg: 'bg-cyan-600/30', text: 'text-cyan-300' },
-  'stop-motion': { bg: 'bg-pink-600/30', text: 'text-pink-300' },
-};
 
 const SUB_TYPE_COLORS: Record<string, string> = {
   'food-action': 'bg-orange-500/20 text-orange-500',
@@ -26,21 +17,6 @@ export function ClipCard({ clip }: ClipCardProps) {
   const { selectedClips, toggleSelectClip } = useStore();
   const isSelected = selectedClips.has(clip.id);
 
-  // Generate monogram placeholder
-  const firstLetter = clip.name.charAt(0).toUpperCase();
-  const categoryKey = clip.sub_type || clip.category || 'product';
-  const colors = CATEGORY_COLORS[categoryKey] || { bg: 'bg-cyan-600/30', text: 'text-cyan-300' };
-
-  const statusIcon = clip.approved ? (
-    <div className="absolute top-3 right-3 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-lg">
-      <Check className="w-3.5 h-3.5 text-white" />
-    </div>
-  ) : clip.rejected ? (
-    <div className="absolute top-3 right-3 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-      <X className="w-3.5 h-3.5 text-white" />
-    </div>
-  ) : null;
-
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -49,55 +25,66 @@ export function ClipCard({ clip }: ClipCardProps) {
 
   return (
     <div
-      onClick={() => toggleSelectClip(clip.id)}
-      className={`group relative overflow-hidden rounded-xl cursor-pointer transition-all duration-200 ${
-        isSelected
-          ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-zinc-950 scale-[1.02]'
-          : 'hover:scale-[1.02] hover:ring-1 hover:ring-zinc-600'
-      }`}
+      className="group relative overflow-hidden rounded-lg bg-zinc-900 border border-zinc-800 cursor-pointer transition-all"
     >
-      {/* Thumbnail Container */}
-      <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
-        {/* Monogram placeholder */}
-        <div className={`absolute inset-0 flex items-center justify-center ${colors.bg}`}>
-          <span className={`text-4xl font-bold ${colors.text}`}>
-            {firstLetter}
-          </span>
+      {/* Thumbnail - aspect-video */}
+      <div className="aspect-video relative overflow-hidden bg-zinc-800 flex items-center justify-center">
+        {/* Placeholder gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-700 to-zinc-800" />
+
+        {/* Selection checkbox - top-left */}
+        <div
+          onClick={() => toggleSelectClip(clip.id)}
+          className={`absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded border flex items-center justify-center transition-all ${
+            isSelected
+              ? 'bg-indigo-500 border-indigo-500'
+              : 'border-zinc-500 bg-black/30 backdrop-blur-sm'
+          }`}
+        >
+          {isSelected && (
+            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          )}
         </div>
 
-        {statusIcon}
+        {/* Hover overlay - opacity 0 to 100 on hover */}
+        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+          <button className="px-3 py-1.5 text-[10px] font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-100 rounded transition-colors">
+            Manage
+          </button>
+          <button className="px-3 py-1.5 text-[10px] font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors">
+            Archive
+          </button>
+          <button className="px-3 py-1.5 text-[10px] font-medium bg-red-600 hover:bg-red-500 text-white rounded transition-colors">
+            Delete
+          </button>
+        </div>
 
-        {/* Duration badge - overlaid on gradient at bottom */}
+        {/* Duration badge - bottom-right, bg-black/70 */}
         {clip.duration > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-end pb-2 pr-2">
-            <div className="flex items-center gap-1 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-sm text-[11px] text-zinc-200">
-              <Clock className="w-3 h-3" />
-              {formatDuration(clip.duration)}
-            </div>
+          <div className="absolute bottom-1.5 right-1.5 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-zinc-300 font-mono">
+            {formatDuration(clip.duration)}
           </div>
         )}
 
-        {/* Selection checkbox */}
-        <div
-          className={`absolute top-3 left-3 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-            isSelected
-              ? 'bg-indigo-500 border-indigo-500'
-              : 'border-zinc-400 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100'
-          }`}
-        >
-          {isSelected && <Check className="w-3 h-3 text-white" />}
-        </div>
+        {/* Status badge - top-right (if needed) */}
+        {(clip.approved || clip.rejected) && (
+          <div className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white bg-emerald-500">
+            {clip.approved ? '✓' : clip.rejected ? '✕' : ''}
+          </div>
+        )}
       </div>
 
-      {/* Info Section */}
-      <div className="p-3 bg-zinc-900 border border-t-0 border-zinc-800">
-        <div className="text-sm font-semibold text-zinc-100 truncate mb-2">
+      {/* Card info section */}
+      <div className="p-2.5 border-t border-zinc-800">
+        <div className="text-[11px] font-semibold text-zinc-200 truncate mb-1.5">
           {clip.name}
         </div>
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-1 flex-wrap">
           {clip.sub_type && (
             <span
-              className={`px-2 py-0.5 text-[10px] font-medium rounded-sm ${
+              className={`px-1.5 py-0.5 text-[9px] rounded-sm font-medium ${
                 SUB_TYPE_COLORS[clip.sub_type] || 'bg-zinc-800 text-zinc-400'
               }`}
             >
@@ -105,19 +92,11 @@ export function ClipCard({ clip }: ClipCardProps) {
             </span>
           )}
           {clip.category && (
-            <span className="px-2 py-0.5 bg-zinc-800 text-zinc-400 text-[10px] rounded-sm">
+            <span className="px-1.5 py-0.5 bg-zinc-800 text-zinc-500 text-[9px] rounded-sm">
               {clip.category}
             </span>
           )}
-          {clip.ratio && (
-            <span className="text-[10px] text-zinc-500">{clip.ratio}</span>
-          )}
         </div>
-        {clip.size_mb > 0 && (
-          <div className="text-[10px] text-zinc-600 mt-1.5">
-            {clip.size_mb.toFixed(1)} MB
-          </div>
-        )}
       </div>
     </div>
   );

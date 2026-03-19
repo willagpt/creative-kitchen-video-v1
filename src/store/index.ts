@@ -44,6 +44,16 @@ interface AppState {
   thumbnailMap: Map<string, string>;
   setThumbnailMap: (map: Map<string, string>) => void;
 
+  // Header filters
+  showCuratedOnly: boolean;
+  setShowCuratedOnly: (show: boolean) => void;
+  showGradedOnly: boolean;
+  setShowGradedOnly: (show: boolean) => void;
+  showMusic: boolean;
+  setShowMusic: (show: boolean) => void;
+  columnCount: number;
+  setColumnCount: (count: number) => void;
+
   // Fetch clips from Supabase
   fetchClips: (workspaceId: string) => Promise<void>;
 }
@@ -100,6 +110,15 @@ export const useStore = create<AppState>((set, get) => ({
 
   thumbnailMap: new Map(),
   setThumbnailMap: (thumbnailMap) => set({ thumbnailMap }),
+
+  showCuratedOnly: false,
+  setShowCuratedOnly: (showCuratedOnly) => set({ showCuratedOnly }),
+  showGradedOnly: false,
+  setShowGradedOnly: (showGradedOnly) => set({ showGradedOnly }),
+  showMusic: false,
+  setShowMusic: (showMusic) => set({ showMusic }),
+  columnCount: 6,
+  setColumnCount: (columnCount) => set({ columnCount }),
 
   fetchClips: async (workspaceId: string) => {
     const { setClips, setLoading } = get();
