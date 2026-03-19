@@ -3,10 +3,10 @@ import { useStore } from '@/store';
 import { Check } from 'lucide-react';
 
 const TYPE_BADGE_COLORS: Record<string, string> = {
-  body: 'bg-indigo-600',
-  hook: 'bg-orange-500',
-  product: 'bg-purple-600',
-  cta: 'bg-teal-500',
+  body: 'bg-[#6b8aff]',
+  hook: 'bg-[#ff6b6b]',
+  product: 'bg-[#f0a030]',
+  cta: 'bg-[#4ecdc4]',
   social_proof: 'bg-pink-500',
   transition: 'bg-zinc-600',
 };
@@ -59,8 +59,8 @@ export function ClipCard({ clip, manageMode = false }: ClipCardProps) {
     <div
       className={`group relative bg-zinc-900 border rounded-lg overflow-hidden cursor-pointer transition-all ${
         isSelected
-          ? 'ring-1 ring-indigo-500 border-indigo-500'
-          : 'border-zinc-800 hover:border-indigo-500/50'
+          ? 'ring-1 ring-purple-500 border-purple-500'
+          : 'border-zinc-800 hover:border-purple-500/50'
       }`}
       onClick={() => toggleSelectClip(clip.id)}
     >
@@ -75,7 +75,7 @@ export function ClipCard({ clip, manageMode = false }: ClipCardProps) {
         <div
           className={`absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded border flex items-center justify-center transition-opacity ${
             isSelected
-              ? 'bg-indigo-500 border-indigo-500 opacity-100'
+              ? 'bg-purple-500 border-purple-500 opacity-100'
               : manageMode
               ? 'border-zinc-500 bg-black/30 opacity-100'
               : 'border-zinc-500 bg-black/30 opacity-0 group-hover:opacity-100'

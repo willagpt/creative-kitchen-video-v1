@@ -31,16 +31,16 @@ export function Pipeline() {
   const shotTypeCoverage = useMemo(() => {
     const types = ['body', 'hook', 'product', 'cta'];
     const typeColors = {
-      body: 'bg-indigo-500',
-      hook: 'bg-red-400',
-      product: 'bg-amber-500',
-      cta: 'bg-teal-400',
+      body: 'bg-[#6b8aff]',
+      hook: 'bg-[#ff6b6b]',
+      product: 'bg-[#f0a030]',
+      cta: 'bg-[#4ecdc4]',
     };
     const typeDots = {
-      body: 'bg-indigo-500',
-      hook: 'bg-red-400',
-      product: 'bg-amber-500',
-      cta: 'bg-teal-400',
+      body: 'bg-[#6b8aff]',
+      hook: 'bg-[#ff6b6b]',
+      product: 'bg-[#f0a030]',
+      cta: 'bg-[#4ecdc4]',
     };
 
     return types.map((type) => {
@@ -85,7 +85,7 @@ export function Pipeline() {
 
   const StatCard = ({ label, value, unit }: { label: string; value: number | string; unit?: string }) => (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 flex-1 min-w-[160px]">
-      <div className="text-3xl font-bold text-zinc-100">{value}</div>
+      <div className="text-3xl font-bold text-zinc-100 tabular-nums">{value}</div>
       <div className="text-xs text-zinc-500 mt-1">
         {label}
         {unit && <span className="ml-1">{unit}</span>}
@@ -121,7 +121,7 @@ export function Pipeline() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-200">Grading Status</h3>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-zinc-500 tabular-nums">
               {gradingStats.graded}/{gradingStats.total} graded
             </span>
           </div>
@@ -150,7 +150,7 @@ export function Pipeline() {
                     <div className={`w-2 h-2 rounded-full ${item.dot}`} />
                     <span className="text-zinc-300 capitalize">{item.type}</span>
                   </div>
-                  <span className="text-zinc-500">
+                  <span className="text-zinc-500 tabular-nums">
                     {item.graded}/{item.total}
                   </span>
                 </div>
@@ -177,13 +177,13 @@ export function Pipeline() {
               <div key={item.ratio} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-zinc-300">{item.ratio}</span>
-                  <span className="text-zinc-500">
+                  <span className="text-zinc-500 tabular-nums">
                     {item.count} ({item.percent}%)
                   </span>
                 </div>
                 <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
                   <div
-                    className="bg-indigo-500 h-full"
+                    className="bg-purple-500 h-full"
                     style={{ width: `${item.percent}%` }}
                   />
                 </div>
@@ -202,7 +202,7 @@ export function Pipeline() {
                   key={cat.name}
                   className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-center"
                 >
-                  <div className="text-lg font-bold text-zinc-100">{cat.count}</div>
+                  <div className="text-lg font-bold text-zinc-100 tabular-nums">{cat.count}</div>
                   <div className="text-[10px] text-zinc-500 truncate">{cat.name}</div>
                 </div>
               ))}

@@ -195,7 +195,7 @@ export function Shots() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-3" />
           <div className="text-zinc-400 text-sm">Loading clips...</div>
         </div>
       </div>
@@ -211,22 +211,22 @@ export function Shots() {
           <span className="text-zinc-100 font-bold">{clips.length}</span>
         </div>
         <div className="flex items-center gap-1.5 text-[11px]">
-          <div className="w-2 h-2 rounded-full bg-indigo-500" />
+          <div className="w-2 h-2 rounded-full bg-[#6b8aff]" />
           <span className="text-zinc-400">Body</span>
           <span className="text-zinc-100 font-bold">{typeStats.body}</span>
         </div>
         <div className="flex items-center gap-1.5 text-[11px]">
-          <div className="w-2 h-2 rounded-full bg-red-400" />
+          <div className="w-2 h-2 rounded-full bg-[#ff6b6b]" />
           <span className="text-zinc-400">Hook</span>
           <span className="text-zinc-100 font-bold">{typeStats.hook}</span>
         </div>
         <div className="flex items-center gap-1.5 text-[11px]">
-          <div className="w-2 h-2 rounded-full bg-amber-500" />
+          <div className="w-2 h-2 rounded-full bg-[#f0a030]" />
           <span className="text-zinc-400">Product</span>
           <span className="text-zinc-100 font-bold">{typeStats.product}</span>
         </div>
         <div className="flex items-center gap-1.5 text-[11px]">
-          <div className="w-2 h-2 rounded-full bg-teal-400" />
+          <div className="w-2 h-2 rounded-full bg-[#4ecdc4]" />
           <span className="text-zinc-400">CTA</span>
           <span className="text-zinc-100 font-bold">{typeStats.cta}</span>
         </div>
@@ -287,7 +287,7 @@ export function Shots() {
         <div className="ml-auto flex items-center gap-2">
           {(manageMode || selectedClips.size > 0) && (
             <>
-              <span className="text-xs text-indigo-400 font-medium">{selectedClips.size} selected</span>
+              <span className="text-xs text-purple-400 font-medium">{selectedClips.size} selected</span>
               <button
                 onClick={clearSelection}
                 className="text-[10px] text-zinc-500 hover:text-zinc-300"
@@ -303,7 +303,7 @@ export function Shots() {
               <div className="w-px h-4 bg-zinc-700" />
             </>
           )}
-          <button className="w-8 h-8 rounded-md bg-indigo-600 text-white flex items-center justify-center">
+          <button className="w-8 h-8 rounded-md bg-purple-600 text-white flex items-center justify-center">
             <Grid3X3 className="w-4 h-4" />
           </button>
           <button className="w-8 h-8 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 flex items-center justify-center">

@@ -43,7 +43,7 @@ const icons = {
 const colors = {
   success: 'border-green-500/30 bg-green-500/10 text-green-400',
   error: 'border-red-500/30 bg-red-500/10 text-red-400',
-  info: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-400',
+  info: 'border-purple-500/30 bg-purple-500/10 text-purple-400',
 };
 
 export function ToastContainer() {

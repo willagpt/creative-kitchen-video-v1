@@ -78,7 +78,7 @@ export function Generate() {
         <div className="p-4 border-b border-zinc-800">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-zinc-100">Generate</h2>
-            <button className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors">
+            <button className="text-[11px] text-purple-400 hover:text-purple-300 transition-colors">
               Edit strategy
             </button>
           </div>
@@ -112,7 +112,7 @@ export function Generate() {
                 onClick={() => setSelectedVariation(test.id)}
                 className={`p-3 rounded-lg border transition-all text-[11px] font-medium ${
                   selectedVariation === test.id
-                    ? 'bg-indigo-900/30 border-indigo-500 text-indigo-300'
+                    ? 'bg-purple-900/30 border-purple-500 text-purple-300'
                     : 'border-zinc-800 bg-zinc-800/20 text-zinc-300 hover:border-zinc-700'
                 }`}
               >
@@ -142,7 +142,7 @@ export function Generate() {
               type="text"
               value={brandPrefix}
               onChange={(e) => setBrandPrefix(e.target.value)}
-              className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500"
+              className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-purple-500"
             />
           </div>
 

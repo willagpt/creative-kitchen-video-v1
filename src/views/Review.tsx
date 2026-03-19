@@ -167,7 +167,7 @@ export function Review() {
               max={duration}
               value={currentTime}
               onChange={(e) => setCurrentTime(parseFloat(e.target.value))}
-              className="flex-1 h-1 bg-zinc-800 rounded-full accent-indigo-500 cursor-pointer"
+              className="flex-1 h-1 bg-zinc-800 rounded-full accent-purple-500 cursor-pointer"
             />
 
             <span className="text-[10px] text-zinc-500 font-mono w-12 text-right flex-shrink-0">
@@ -182,7 +182,7 @@ export function Review() {
             <h3 className="text-sm font-semibold text-zinc-200">Rendered Videos</h3>
             <button
               onClick={handleSelectAllReady}
-              className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-[11px] text-purple-400 hover:text-purple-300 transition-colors"
             >
               Select all ready
             </button>

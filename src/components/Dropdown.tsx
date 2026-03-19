@@ -54,7 +54,7 @@ export function Dropdown({ value, onChange, options, placeholder }: DropdownProp
             >
               {option.label}
               {value === option.value && (
-                <Check className="w-3.5 h-3.5 text-indigo-400" />
+                <Check className="w-3.5 h-3.5 text-purple-400" />
               )}
             </button>
           ))}

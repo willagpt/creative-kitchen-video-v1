@@ -146,8 +146,8 @@ export function Perf() {
 
   const StatCard = ({ label, value }: { label: string; value: string | number }) => (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 flex-1 min-w-[160px]">
-      <div className="text-3xl font-bold text-zinc-100">{value}</div>
-      <div className="text-xs text-zinc-500 mt-1">{label}</div>
+      <div className="text-3xl font-bold text-zinc-100 tabular-nums">{value}</div>
+      <div className="text-xs text-zinc-500 mt-1 uppercase tracking-widest">{label}</div>
     </div>
   );
 
@@ -213,7 +213,7 @@ export function Perf() {
                     <div key={ad.name} className="flex flex-col items-center gap-2 flex-1 min-w-0">
                       <div className="relative w-full h-32 flex items-end justify-center">
                         <div className={`${getBarColor(ad.roas)} rounded-t w-full`} style={{ height: `${heightPercent}%` }} />
-                        <div className="absolute -top-6 text-xs font-semibold text-zinc-300">{ad.roas.toFixed(1)}x</div>
+                        <div className="absolute -top-6 text-xs font-semibold text-zinc-300 tabular-nums">{ad.roas.toFixed(1)}x</div>
                       </div>
                       <span className="text-[9px] text-zinc-500 text-center truncate w-full px-1">{ad.name}</span>
                     </div>
@@ -243,14 +243,14 @@ export function Perf() {
                         {(tier === 'REWORK' || tier === 'KILL') && (
                           <button
                             onClick={() => handleReiterate(ad)}
-                            className="text-[10px] px-2 py-0.5 rounded border border-indigo-500/30 bg-indigo-600/10 text-indigo-400 hover:bg-indigo-600/20 transition-colors whitespace-nowrap"
+                            className="text-[10px] px-2 py-0.5 rounded border border-purple-500/30 bg-purple-600/10 text-purple-400 hover:bg-purple-600/20 transition-colors whitespace-nowrap"
                           >
                             Re-iterate
                           </button>
                         )}
                       </div>
                     </div>
-                    <div className="text-sm font-bold text-zinc-100">{ad.roas.toFixed(1)}x</div>
+                    <div className="text-sm font-bold text-zinc-100 tabular-nums">{ad.roas.toFixed(1)}x</div>
                   </div>
                 );
               })}
@@ -276,8 +276,8 @@ export function Perf() {
 
                     {/* Dot */}
                     <div className="relative" style={{ height: `${heightPercent * 1.28}px`, width: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                      <div className="w-2 h-2 rounded-full bg-indigo-500" />
-                      <div className="absolute -top-5 text-xs font-semibold text-zinc-400">{point.ctr.toFixed(1)}%</div>
+                      <div className="w-2 h-2 rounded-full bg-purple-500" />
+                      <div className="absolute -top-5 text-xs font-semibold text-zinc-400 tabular-nums">{point.ctr.toFixed(1)}%</div>
                     </div>
 
                     {/* Label */}

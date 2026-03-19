@@ -103,7 +103,7 @@ export function WorkspaceSetup() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <ChefHat className="w-10 h-10 text-indigo-400" />
+            <ChefHat className="w-10 h-10 text-purple-400" />
             <h1 className="text-2xl font-bold text-zinc-100">Set up your workspace</h1>
           </div>
           <p className="text-zinc-400 text-sm">
@@ -131,7 +131,7 @@ export function WorkspaceSetup() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
               placeholder="My Production Company"
               required
             />
@@ -140,7 +140,7 @@ export function WorkspaceSetup() {
           <button
             type="submit"
             disabled={loading || !name.trim()}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

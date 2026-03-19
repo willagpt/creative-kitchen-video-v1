@@ -74,17 +74,17 @@ export function Recipes() {
   const getShotColor = (type: string) => {
     switch (type) {
       case 'HOOK':
-        return 'bg-orange-500';
+        return 'bg-[#ff6b6b]';
       case 'BODY 1':
       case 'BODY 2':
       case 'BODY 3':
       case 'BODY 4':
       case 'BODY 5':
-        return 'bg-indigo-600';
+        return 'bg-[#6b8aff]';
       case 'PRODUCT':
-        return 'bg-purple-600';
+        return 'bg-[#f0a030]';
       case 'CTA':
-        return 'bg-teal-500';
+        return 'bg-[#4ecdc4]';
       default:
         return 'bg-zinc-600';
     }
@@ -96,7 +96,7 @@ export function Recipes() {
       <div className="w-56 border-r border-zinc-800 bg-zinc-900/30 flex flex-col overflow-hidden">
         {/* Action buttons */}
         <div className="px-3 py-3 border-b border-zinc-800 space-y-2 flex-shrink-0">
-          <button className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors">
+          <button className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-colors">
             <Plus className="w-3.5 h-3.5" />
             New Recipe
           </button>
@@ -117,7 +117,7 @@ export function Recipes() {
                 onClick={() => handleSelectRecipe(recipe.id)}
                 className={`w-full px-3 py-2 rounded-lg text-left border transition-all ${
                   selectedRecipeId === recipe.id
-                    ? 'bg-indigo-900/30 border-indigo-500'
+                    ? 'bg-purple-900/30 border-purple-500'
                     : 'bg-zinc-800/20 border-zinc-800 hover:border-zinc-700'
                 }`}
               >
@@ -154,7 +154,7 @@ export function Recipes() {
                     type="text"
                     value={recipeName}
                     onChange={(e) => setRecipeName(e.target.value)}
-                    className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500"
+                    className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-purple-500"
                   />
                 </div>
                 <div>
@@ -164,7 +164,7 @@ export function Recipes() {
                   <select
                     value={recipeRatio}
                     onChange={(e) => setRecipeRatio(e.target.value)}
-                    className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer"
+                    className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 focus:outline-none focus:border-purple-500 appearance-none cursor-pointer"
                   >
                     <option>1:1</option>
                     <option>16:9</option>
@@ -178,7 +178,7 @@ export function Recipes() {
                   <select
                     value={recipeFormat}
                     onChange={(e) => setRecipeFormat(e.target.value)}
-                    className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer"
+                    className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 focus:outline-none focus:border-purple-500 appearance-none cursor-pointer"
                   >
                     <option>7s Snappy</option>
                     <option>10s HS1</option>

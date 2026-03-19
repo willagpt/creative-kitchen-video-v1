@@ -61,10 +61,10 @@ export function Layout({ children }: { children: ReactNode }) {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
                   active
                     ? item.accent
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-purple-600 text-white'
                       : 'bg-zinc-800 text-zinc-100'
                     : item.accent
-                    ? 'text-indigo-400 hover:bg-indigo-600/20'
+                    ? 'text-purple-400 hover:bg-purple-600/20'
                     : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
                 }`}
               >
@@ -101,7 +101,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <button className="text-zinc-500 hover:text-zinc-300 transition-colors p-0.5">
             <Settings className="w-4 h-4" />
           </button>
-          <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-purple-600 text-white text-[10px] font-bold flex items-center justify-center">
             {userInitial}
           </div>
           <button

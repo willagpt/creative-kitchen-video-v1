@@ -22,10 +22,10 @@ const COLOUR_GRADE_PRESETS: Record<string, ColourGrade> = {
 };
 
 const SUB_TYPE_STYLES: Record<SubType, string> = {
-  'food-action': 'border-orange-500 bg-orange-500/20 text-orange-400',
-  'food-beauty': 'border-yellow-500 bg-yellow-500/20 text-yellow-400',
-  'lifestyle': 'border-purple-500 bg-purple-500/20 text-purple-400',
-  'product': 'border-cyan-500 bg-cyan-500/20 text-cyan-400',
+  'food-action': 'border-[#ff6b6b] bg-[#ff6b6b]/20 text-[#ff6b6b]',
+  'food-beauty': 'border-[#f0a030] bg-[#f0a030]/20 text-[#f0a030]',
+  'lifestyle': 'border-[#6b8aff] bg-[#6b8aff]/20 text-[#6b8aff]',
+  'product': 'border-[#4ecdc4] bg-[#4ecdc4]/20 text-[#4ecdc4]',
   'stop-motion': 'border-pink-500 bg-pink-500/20 text-pink-400',
 };
 
