@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { ColourGrade } from '@/types';
+import type { ColourGrade, SubType } from '@/types';
 import { useStore } from '@/store';
 import { supabase } from '@/lib/supabase';
 import { logActivity } from '@/lib/activity';
@@ -19,12 +19,30 @@ const COLOUR_GRADE_PRESETS: Record<string, ColourGrade> = {
   'Punchy': { brightness: 100, contrast: 125, saturate: 125, temperature: 0, shadows: -12 },
 };
 
+const SUB_TYPE_STYLES: Record<SubType, string> = {
+  'food-action': 'border-orange-500 bg-orange-500/20 text-orange-400',
+  'food-beauty': 'border-yellow-500 bg-yellow-500/20 text-yellow-400',
+  'lifestyle': 'border-purple-500 bg-purple-500/20 text-purple-400',
+  'product': 'border-cyan-500 bg-cyan-500/20 text-cyan-400',
+  'stop-motion': 'border-pink-500 bg-pink-500/20 text-pink-400',
+};
+
+const TAG_CATEGORIES: Record<string, string[]> = {
+  'SHOT STYLE': ['close up', 'handheld', 'studio', 'tripod', 'stop motion'],
+  'ACTION': ['stir', 'pour', 'plate', 'eat', 'open', 'sprinkle'],
+  'SUBJECT': ['meal', 'person', 'kitchen', 'hands', 'box', 'delivery'],
+  'MOOD': ['vibrant', 'warm', 'bright', 'clean', 'natural light'],
+};
+
 export function Curate() {
   const { clips, setActiveTab, updateClip, user, workspace } = useStore();
   const [clipsLoaded, setClipsLoaded] = useState(false);
   const [showColourPanel, setShowColourPanel] = useState(false);
   const [colourGrade, setColourGrade] = useState<ColourGrade>(COLOUR_GRADE_PRESETS.Original);
   const [activePreset, setActivePreset] = useState('Original');
+  const [trimIn, setTrimIn] = useState<number | null>(null);
+  const [trimOut, setTrimOut] = useState<number | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     setActiveTab('curate');
@@ -46,6 +64,16 @@ export function Curate() {
   const currentClipIndex = pendingClips.indexOf(firstPendingClip || pendingClips[0]);
 
   useEffect(() => {
+    if (firstPendingClip) {
+      setTrimIn(firstPendingClip.trim_in);
+      setTrimOut(firstPendingClip.trim_out);
+      setSelectedTags(firstPendingClip.tags || []);
+      setColourGrade(firstPendingClip.colour_grade || COLOUR_GRADE_PRESETS.Original);
+      setActivePreset(firstPendingClip.colour_grade ? 'Custom' : 'Original');
+    }
+  }, [firstPendingClip]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       switch (e.key.toLowerCase()) {
@@ -61,11 +89,25 @@ export function Curate() {
           e.preventDefault();
           handleSkip();
           break;
+        case 'i':
+          e.preventDefault();
+          setTrimIn(0);
+          break;
+        case 'o':
+          e.preventDefault();
+          if (firstPendingClip) {
+            setTrimOut(firstPendingClip.duration);
+          }
+          break;
+        case 'p':
+          e.preventDefault();
+          handlePreviewTrim();
+          break;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentClipIndex, pendingClips]);
+  }, [currentClipIndex, pendingClips, firstPendingClip]);
 
   const handleApprove = async () => {
     if (!firstPendingClip) return;
@@ -74,13 +116,25 @@ export function Curate() {
       if (activePreset !== 'Original') {
         updateData.colour_grade = colourGrade;
       }
+      if (trimIn !== null) {
+        updateData.trim_in = trimIn;
+      }
+      if (trimOut !== null) {
+        updateData.trim_out = trimOut;
+      }
 
       const { error } = await supabase
         .from('clips')
         .update(updateData)
         .eq('id', firstPendingClip.id);
       if (error) throw error;
-      updateClip(firstPendingClip.id, { approved: true, rejected: false, colour_grade: activePreset !== 'Original' ? colourGrade : null });
+      updateClip(firstPendingClip.id, {
+        approved: true,
+        rejected: false,
+        colour_grade: activePreset !== 'Original' ? colourGrade : null,
+        trim_in: trimIn,
+        trim_out: trimOut,
+      });
 
       if (user && workspace) {
         await logActivity(
@@ -126,6 +180,67 @@ export function Curate() {
 
   const handleSkip = () => {
     // Skip just moves to next pending clip (UI rerender handles this)
+  };
+
+  const handleSubTypeChange = async (st: SubType) => {
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({ sub_type: st })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      updateClip(firstPendingClip.id, { sub_type: st });
+    } catch (err) {
+      console.error('Failed to update sub_type:', err);
+    }
+  };
+
+  const handleTrimChange = async (field: 'trim_in' | 'trim_out', value: number | null) => {
+    if (!firstPendingClip) return;
+    try {
+      const updateData: Record<string, unknown> = {};
+      updateData[field] = value;
+      const { error } = await supabase
+        .from('clips')
+        .update(updateData)
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      if (field === 'trim_in') {
+        setTrimIn(value);
+        updateClip(firstPendingClip.id, { trim_in: value });
+      } else {
+        setTrimOut(value);
+        updateClip(firstPendingClip.id, { trim_out: value });
+      }
+    } catch (err) {
+      console.error('Failed to update trim:', err);
+    }
+  };
+
+  const handlePreviewTrim = () => {
+    // Placeholder for preview trim functionality
+    console.log('Preview trim:', { trimIn, trimOut });
+  };
+
+  const handleTagToggle = async (tag: string) => {
+    const newTags = selectedTags.includes(tag)
+      ? selectedTags.filter((t) => t !== tag)
+      : [...selectedTags, tag];
+
+    setSelectedTags(newTags);
+
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({ tags: newTags })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      updateClip(firstPendingClip.id, { tags: newTags });
+    } catch (err) {
+      console.error('Failed to update tags:', err);
+    }
   };
 
   const ColourGradePanel = () => (
@@ -438,17 +553,145 @@ export function Curate() {
               </div>
 
               {/* Clip info */}
-              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-zinc-100">{firstPendingClip.name}</h3>
-                  <span className="text-xs px-2 py-1 bg-zinc-800 text-zinc-400 rounded">
-                    {firstPendingClip.category}
-                  </span>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-zinc-100">{firstPendingClip.name}</h3>
+                    <span className="text-xs px-2 py-1 bg-zinc-800 text-zinc-400 rounded">
+                      {firstPendingClip.category}
+                    </span>
+                  </div>
+                  <div className="flex gap-4 text-xs text-zinc-500">
+                    <span>{firstPendingClip.duration.toFixed(1)}s</span>
+                    <span>{firstPendingClip.ratio}</span>
+                    <span className="capitalize">{firstPendingClip.type || 'body'}</span>
+                  </div>
                 </div>
-                <div className="flex gap-4 text-xs text-zinc-500">
-                  <span>{firstPendingClip.duration.toFixed(1)}s</span>
-                  <span>{firstPendingClip.ratio}</span>
-                  <span className="capitalize">{firstPendingClip.type || 'body'}</span>
+
+                {/* Sub-type selector */}
+                <div className="pt-2 border-t border-zinc-800">
+                  <h4 className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Sub-type</h4>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {(['food-action', 'food-beauty', 'lifestyle', 'product', 'stop-motion'] as const).map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => handleSubTypeChange(st)}
+                        className={`px-2 py-1 text-[10px] rounded-full border transition-colors ${
+                          firstPendingClip.sub_type === st
+                            ? SUB_TYPE_STYLES[st]
+                            : 'border-zinc-700 text-zinc-500 hover:border-zinc-600'
+                        }`}
+                      >
+                        {st}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Trim controls */}
+                <div className="pt-2 border-t border-zinc-800">
+                  <h4 className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3">Trim</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs text-zinc-400">
+                      <span>
+                        IN: {(trimIn ?? 0).toFixed(1)}s → OUT: {(trimOut ?? firstPendingClip.duration).toFixed(1)}s
+                      </span>
+                      <span className="text-zinc-600">
+                        (trimmed: {((trimOut ?? firstPendingClip.duration) - (trimIn ?? 0)).toFixed(1)}s)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => handleTrimChange('trim_in', (trimIn ?? 0) - 0.1)}
+                          className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                        >
+                          -0.1s
+                        </button>
+                        <button
+                          onClick={() => handleTrimChange('trim_in', (trimIn ?? 0) + 0.1)}
+                          className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                        >
+                          +0.1s
+                        </button>
+                      </div>
+
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => handleTrimChange('trim_out', (trimOut ?? firstPendingClip.duration) - 0.1)}
+                          className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                        >
+                          -0.1s
+                        </button>
+                        <button
+                          onClick={() => handleTrimChange('trim_out', (trimOut ?? firstPendingClip.duration) + 0.1)}
+                          className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                        >
+                          +0.1s
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setTrimIn(0)}
+                        className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                      >
+                        Set IN <span className="text-zinc-500">[I]</span>
+                      </button>
+                      <button
+                        onClick={() => setTrimOut(firstPendingClip.duration)}
+                        className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                      >
+                        Set OUT <span className="text-zinc-500">[O]</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTrimIn(null);
+                          setTrimOut(null);
+                          handleTrimChange('trim_in', null);
+                          handleTrimChange('trim_out', null);
+                        }}
+                        className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        onClick={handlePreviewTrim}
+                        className="flex-1 px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors"
+                      >
+                        Preview <span className="text-zinc-500">[P]</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tags section */}
+                <div className="pt-2 border-t border-zinc-800">
+                  <h4 className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3">Tags</h4>
+                  <div className="space-y-3">
+                    {Object.entries(TAG_CATEGORIES).map(([category, tags]) => (
+                      <div key={category}>
+                        <p className="text-[10px] text-zinc-600 uppercase tracking-wider mb-1.5">{category}</p>
+                        <div className="flex gap-1.5 flex-wrap">
+                          {tags.map((tag) => (
+                            <button
+                              key={tag}
+                              onClick={() => handleTagToggle(tag)}
+                              className={`px-2 py-1 text-[10px] rounded-full border transition-colors ${
+                                selectedTags.includes(tag)
+                                  ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400'
+                                  : 'border-zinc-700 text-zinc-500 hover:border-zinc-600'
+                              }`}
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
