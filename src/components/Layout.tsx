@@ -5,12 +5,12 @@ import { Settings } from 'lucide-react';
 
 const navItems = [
   { id: 'shots', label: 'Shots', path: '/shots', step: '1', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
-  { id: 'curate', label: 'Curate', path: '/curate', step: '2', icon: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z', disabled: true },
-  { id: 'generate', label: 'Generate', path: '/generate', step: '3', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z', disabled: true, accent: true },
-  { id: 'review', label: 'Review', path: '/review', step: '4', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z', disabled: true },
-  { id: 'recipes', label: 'Recipes', path: '/recipes', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', disabled: true },
-  { id: 'performance', label: 'Perf', path: '/perf', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', disabled: true },
-  { id: 'pipeline', label: 'Pipeline', path: '/pipeline', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6M9 19h6M15 19v-6a2 2 0 012-2h2a2 2 0 012 2v6', disabled: true },
+  { id: 'curate', label: 'Curate', path: '/curate', step: '2', icon: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' },
+  { id: 'generate', label: 'Generate', path: '/generate', step: '3', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z', accent: true },
+  { id: 'review', label: 'Review', path: '/review', step: '4', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z' },
+  { id: 'recipes', label: 'Recipes', path: '/recipes', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+  { id: 'performance', label: 'Perf', path: '/perf', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+  { id: 'pipeline', label: 'Pipeline', path: '/pipeline', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6M9 19h6M15 19v-6a2 2 0 012-2h2a2 2 0 012 2v6' },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -18,7 +18,6 @@ export function Layout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   const handleNav = (item: typeof navItems[0]) => {
-    if (item.disabled) return;
     setActiveTab(item.id);
     navigate(item.path);
   };
@@ -52,7 +51,6 @@ export function Layout({ children }: { children: ReactNode }) {
               <button
                 key={item.id}
                 onClick={() => handleNav(item)}
-                disabled={item.disabled}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
                   active
                     ? item.accent
@@ -60,8 +58,6 @@ export function Layout({ children }: { children: ReactNode }) {
                       : 'bg-zinc-800 text-zinc-100'
                     : item.accent
                     ? 'text-indigo-400 hover:bg-indigo-600/20'
-                    : item.disabled
-                    ? 'text-zinc-600 cursor-not-allowed'
                     : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
                 }`}
               >
@@ -110,8 +106,8 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
+      {/* Main content — V1: flex-1 min-h-0 */}
+      <main className="flex-1 min-h-0">
         {children}
       </main>
 

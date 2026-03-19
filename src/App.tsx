@@ -6,6 +6,12 @@ import { Auth } from '@/views/Auth';
 import { WorkspaceSetup } from '@/views/WorkspaceSetup';
 import { Layout } from '@/components/Layout';
 import { Shots } from '@/views/Shots';
+import { Curate } from '@/views/Curate';
+import { Generate } from '@/views/Generate';
+import { Review } from '@/views/Review';
+import { Recipes } from '@/views/Recipes';
+import { Perf } from '@/views/Perf';
+import { Pipeline } from '@/views/Pipeline';
 import { ToastContainer } from '@/components/Toast';
 
 export default function App() {
@@ -54,6 +60,12 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/shots" replace />} />
           <Route path="/shots" element={<Shots />} />
+          <Route path="/curate" element={<Curate />} />
+          <Route path="/generate" element={<Generate />} />
+          <Route path="/review" element={<Review />} />
+          <Route path="/recipes" element={<Recipes />} />
+          <Route path="/perf" element={<Perf />} />
+          <Route path="/pipeline" element={<Pipeline />} />
           <Route path="*" element={<Navigate to="/shots" replace />} />
         </Routes>
       </Layout>

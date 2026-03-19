@@ -1,0 +1,321 @@
+import { useEffect, useState } from 'react';
+import { useStore } from '@/store';
+
+interface StrategyOption {
+  id: string;
+  name: string;
+}
+
+export function Generate() {
+  const { setActiveTab } = useStore();
+
+  // Static demo data
+  const personas: StrategyOption[] = [
+    { id: 'busy-prof', name: 'Busy Professional' },
+    { id: 'health-ent', name: 'Health Enthusiast' },
+    { id: 'family-prov', name: 'Family Provider' },
+  ];
+
+  const pillars: StrategyOption[] = [
+    { id: 'time-eff', name: 'Time Efficiency' },
+    { id: 'weight-loss', name: 'Weight Loss' },
+    { id: 'price-value', name: 'Price & Value' },
+  ];
+
+  const formats: StrategyOption[] = [
+    { id: '7s-snappy', name: '7s Snappy' },
+    { id: '10s-hs1', name: '10s HS1 Winner' },
+    { id: '15s-narr', name: '15s Narrative' },
+    { id: '10s-prod', name: '10s Product Focus' },
+  ];
+
+  const ratios = ['1:1', '16:9', '9:16'];
+
+  const variationTests = [
+    { id: 'full-mix', label: 'Full Mix' },
+    { id: 'hook-test', label: 'Hook Test' },
+    { id: 'body-test', label: 'Body Test' },
+    { id: 'cta-test', label: 'CTA Test' },
+  ];
+
+  const [selectedPersona, setSelectedPersona] = useState<string>('busy-prof');
+  const [selectedPillar, setSelectedPillar] = useState<string>('time-eff');
+  const [selectedFormat, setSelectedFormat] = useState<string>('7s-snappy');
+  const [selectedRatio, setSelectedRatio] = useState<string>('1:1');
+  const [selectedVariation, setSelectedVariation] = useState<string>('full-mix');
+  const [brandPrefix, setBrandPrefix] = useState<string>('CK');
+  const [columnCount, setColumnCount] = useState<number>(5);
+  const [curatedOnly, setCuratedOnly] = useState<boolean>(false);
+  const [gradedOnly, setGradedOnly] = useState<boolean>(false);
+  const [useMusic, setUseMusic] = useState<boolean>(true);
+
+  useEffect(() => {
+    setActiveTab('generate');
+  }, [setActiveTab]);
+
+  const personaData = personas.find((p) => p.id === selectedPersona);
+  const pillarData = pillars.find((p) => p.id === selectedPillar);
+  const formatData = formats.find((f) => f.id === selectedFormat);
+
+  return (
+    <div className="h-full flex overflow-hidden bg-zinc-950">
+      {/* LEFT SIDEBAR */}
+      <div className="w-72 border-r border-zinc-800 bg-zinc-900/30 flex flex-col overflow-y-auto">
+        <div className="p-4 border-b border-zinc-800">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-zinc-100">Generate</h2>
+            <button className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors">
+              Edit strategy
+            </button>
+          </div>
+
+          {/* Strategy Pills */}
+          <div className="flex flex-wrap gap-2">
+            <div className="px-2.5 py-1 rounded-full border border-teal-600/50 bg-teal-600/10 text-[10px] text-zinc-200">
+              {personaData?.name}
+            </div>
+            <div className="px-2.5 py-1 rounded-full border border-emerald-600/50 bg-emerald-600/10 text-[10px] text-zinc-200">
+              {pillarData?.name}
+            </div>
+            <div className="px-2.5 py-1 rounded-full border border-amber-600/50 bg-amber-600/10 text-[10px] text-zinc-200">
+              {formatData?.name}
+            </div>
+            <div className="px-2.5 py-1 rounded-full border border-zinc-700 bg-zinc-800/30 text-[10px] text-zinc-400">
+              {selectedRatio}
+            </div>
+          </div>
+        </div>
+
+        {/* VARIATION TESTING */}
+        <div className="p-4 border-b border-zinc-800">
+          <h3 className="text-xs font-semibold text-zinc-200 mb-3 uppercase tracking-wider">
+            Variation Testing
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            {variationTests.map((test) => (
+              <button
+                key={test.id}
+                onClick={() => setSelectedVariation(test.id)}
+                className={`p-3 rounded-lg border transition-all text-[11px] font-medium ${
+                  selectedVariation === test.id
+                    ? 'bg-indigo-900/30 border-indigo-500 text-indigo-300'
+                    : 'border-zinc-800 bg-zinc-800/20 text-zinc-300 hover:border-zinc-700'
+                }`}
+              >
+                {test.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* MANAGE CTAs */}
+        <div className="p-4 border-b border-zinc-800">
+          <h3 className="text-xs font-semibold text-zinc-200 mb-2 uppercase tracking-wider">
+            Manage CTAs
+          </h3>
+          <div className="text-[10px] text-zinc-500 p-2 border border-zinc-800 rounded bg-zinc-900/30">
+            No CTAs excluded yet
+          </div>
+        </div>
+
+        {/* CONTROLS */}
+        <div className="p-4 space-y-4 border-b border-zinc-800">
+          <div>
+            <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+              Brand Prefix
+            </label>
+            <input
+              type="text"
+              value={brandPrefix}
+              onChange={(e) => setBrandPrefix(e.target.value)}
+              className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+              Ratio
+            </label>
+            <select
+              value={selectedRatio}
+              onChange={(e) => setSelectedRatio(e.target.value)}
+              className="mt-1 w-full px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-[11px] text-zinc-100 focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer"
+            >
+              {ratios.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={curatedOnly}
+                onChange={(e) => setCuratedOnly(e.target.checked)}
+                className="w-4 h-4 rounded border border-zinc-600 bg-zinc-800 cursor-pointer"
+              />
+              <span className="text-[11px] text-zinc-300">Curated only</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={gradedOnly}
+                onChange={(e) => setGradedOnly(e.target.checked)}
+                className="w-4 h-4 rounded border border-zinc-600 bg-zinc-800 cursor-pointer"
+              />
+              <span className="text-[11px] text-zinc-300">Graded only</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={useMusic}
+                onChange={(e) => setUseMusic(e.target.checked)}
+                className="w-4 h-4 rounded border border-zinc-600 bg-zinc-800 cursor-pointer"
+              />
+              <span className="text-[11px] text-zinc-300">Music</span>
+            </label>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+              Column Count
+            </label>
+            <div className="mt-1 flex items-center gap-2">
+              <input
+                type="range"
+                min="3"
+                max="10"
+                value={columnCount}
+                onChange={(e) => setColumnCount(parseInt(e.target.value))}
+                className="flex-1 h-1.5 rounded-full bg-zinc-700 accent-indigo-500 cursor-pointer"
+              />
+              <span className="text-[10px] text-zinc-500 w-6">{columnCount}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* AVAILABLE CLIPS */}
+        <div className="p-4 border-b border-zinc-800 space-y-2">
+          <h3 className="text-xs font-semibold text-zinc-200 uppercase tracking-wider">
+            Available Clips
+          </h3>
+          <div className="flex gap-1.5 flex-wrap">
+            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full bg-red-400" />
+              <span>Hook: 12</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full bg-indigo-500" />
+              <span>Body: 28</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <span>Product: 8</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full bg-teal-400" />
+              <span>CTA: 4</span>
+            </div>
+          </div>
+          <div className="text-[10px] text-zinc-500 mt-2">
+            Music: 3 tracks
+          </div>
+          <div className="text-[10px] text-zinc-600">
+            ~120 possible combos
+          </div>
+        </div>
+
+        {/* GENERATE BUTTON */}
+        <div className="p-4">
+          <button className="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors">
+            Generate 5 Variations
+          </button>
+        </div>
+
+        {/* TARGET PERSONA */}
+        <div className="px-4 py-3 border-t border-zinc-800 space-y-2">
+          <h3 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+            Target Persona
+          </h3>
+          <div className="space-y-2">
+            {personas.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedPersona(p.id)}
+                className={`w-full px-3 py-2 rounded-lg border text-[11px] font-medium transition-all text-left ${
+                  selectedPersona === p.id
+                    ? 'bg-indigo-900/30 border-indigo-500 text-indigo-300'
+                    : 'border-zinc-800 bg-zinc-800/20 text-zinc-300 hover:border-zinc-700'
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* CONTENT PILLAR */}
+        <div className="px-4 py-3 border-t border-zinc-800 space-y-2">
+          <h3 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+            Content Pillar
+          </h3>
+          <div className="space-y-2">
+            {pillars.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedPillar(p.id)}
+                className={`w-full px-3 py-2 rounded-lg border text-[11px] font-medium transition-all text-left ${
+                  selectedPillar === p.id
+                    ? 'bg-indigo-900/30 border-indigo-500 text-indigo-300'
+                    : 'border-zinc-800 bg-zinc-800/20 text-zinc-300 hover:border-zinc-700'
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* AD FORMAT */}
+        <div className="px-4 py-3 border-t border-zinc-800 space-y-2">
+          <h3 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+            Ad Format
+          </h3>
+          <div className="space-y-2">
+            {formats.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setSelectedFormat(f.id)}
+                className={`w-full px-3 py-2 rounded-lg border text-[11px] font-medium transition-all text-left ${
+                  selectedFormat === f.id
+                    ? 'bg-indigo-900/30 border-indigo-500 text-indigo-300'
+                    : 'border-zinc-800 bg-zinc-800/20 text-zinc-300 hover:border-zinc-700'
+                }`}
+              >
+                {f.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center px-6 max-w-md">
+          <h2 className="text-lg font-semibold text-zinc-100 mb-3">
+            Strategy-Driven Generation
+          </h2>
+          <p className="text-[12px] text-zinc-400 leading-relaxed">
+            Select your target persona, content pillar, and ad format on the left.
+            Each variation follows the AIDA framework with auto-generated text
+            overlays, enforced action-to-static shot ratios, and persona-aligned
+            clip selection.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

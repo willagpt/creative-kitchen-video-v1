@@ -1,0 +1,209 @@
+import { useEffect, useMemo } from 'react';
+import { useStore } from '@/store';
+
+export function Pipeline() {
+  const { clips, setActiveTab } = useStore();
+
+  useEffect(() => {
+    setActiveTab('pipeline');
+  }, [setActiveTab]);
+
+  // Calculate all stats from clips
+  const stats = useMemo(() => {
+    const stats = {
+      clipsCount: clips.length,
+      musicTracks: 24,
+      graphics: 4,
+      totalDuration: clips.reduce((sum, c) => sum + c.duration, 0),
+      totalSize: clips.reduce((sum, c) => sum + c.size_mb, 0),
+    };
+    return stats;
+  }, [clips]);
+
+  // Calculate grading status
+  const gradingStats = useMemo(() => {
+    const graded = clips.filter((c) => c.graded).length;
+    const total = clips.length;
+    return { graded, total };
+  }, [clips]);
+
+  // Calculate shot type coverage
+  const shotTypeCoverage = useMemo(() => {
+    const types = ['body', 'hook', 'product', 'cta'];
+    const typeColors = {
+      body: 'bg-indigo-500',
+      hook: 'bg-red-400',
+      product: 'bg-amber-500',
+      cta: 'bg-teal-400',
+    };
+    const typeDots = {
+      body: 'bg-indigo-500',
+      hook: 'bg-red-400',
+      product: 'bg-amber-500',
+      cta: 'bg-teal-400',
+    };
+
+    return types.map((type) => {
+      const typeClips = clips.filter((c) => (c.type || 'body').toLowerCase() === type);
+      const graded = typeClips.filter((c) => c.graded).length;
+      const total = typeClips.length;
+      const percent = total > 0 ? Math.round((graded / total) * 100) : 0;
+      return {
+        type,
+        total,
+        graded,
+        percent,
+        color: typeColors[type as keyof typeof typeColors],
+        dot: typeDots[type as keyof typeof typeDots],
+      };
+    });
+  }, [clips]);
+
+  // Calculate aspect ratio distribution
+  const ratioDistribution = useMemo(() => {
+    const ratios = ['16:9', '9:16', '1:1'];
+    const total = clips.length || 1;
+    return ratios.map((ratio) => {
+      const count = clips.filter((c) => c.ratio === ratio).length;
+      const percent = Math.round((count / total) * 100);
+      return { ratio, count, percent };
+    });
+  }, [clips]);
+
+  // Calculate category breakdown
+  const categoryBreakdown = useMemo(() => {
+    const categoryMap = new Map<string, number>();
+    clips.forEach((c) => {
+      if (c.category) {
+        categoryMap.set(c.category, (categoryMap.get(c.category) || 0) + 1);
+      }
+    });
+    return Array.from(categoryMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [clips]);
+
+  const StatCard = ({ label, value, unit }: { label: string; value: number | string; unit?: string }) => (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 flex-1 min-w-[160px]">
+      <div className="text-3xl font-bold text-zinc-100">{value}</div>
+      <div className="text-xs text-zinc-500 mt-1">
+        {label}
+        {unit && <span className="ml-1">{unit}</span>}
+      </div>
+    </div>
+  );
+
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-zinc-950 overflow-auto">
+      <div className="flex-1 p-6 space-y-8">
+        {/* Stat Cards */}
+        <div className="flex gap-4 flex-wrap">
+          <StatCard label="Video Clips" value={stats.clipsCount} />
+          <StatCard label="Music Tracks" value={stats.musicTracks} />
+          <StatCard label="Graphics" value={stats.graphics} />
+          <StatCard label="Total Duration" value={formatDuration(stats.totalDuration)} />
+          <StatCard label="Total Size" value={stats.totalSize.toFixed(1)} unit="MB" />
+        </div>
+
+        {/* Grading Status */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-zinc-200">Grading Status</h3>
+            <span className="text-xs text-zinc-500">
+              {gradingStats.graded}/{gradingStats.total} graded
+            </span>
+          </div>
+          <div className="flex gap-1 h-2 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+            <div
+              className="bg-emerald-500"
+              style={{
+                width:
+                  gradingStats.total > 0
+                    ? `${(gradingStats.graded / gradingStats.total) * 100}%`
+                    : '0%',
+              }}
+            />
+            <div className="bg-amber-500 flex-1" />
+          </div>
+        </div>
+
+        {/* Shot Type Coverage */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-zinc-200">Shot Type Coverage</h3>
+          <div className="space-y-2">
+            {shotTypeCoverage.map((item) => (
+              <div key={item.type} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${item.dot}`} />
+                    <span className="text-zinc-300 capitalize">{item.type}</span>
+                  </div>
+                  <span className="text-zinc-500">
+                    {item.graded}/{item.total}
+                  </span>
+                </div>
+                <div className="flex gap-0.5 h-1 bg-zinc-900 rounded-full overflow-hidden">
+                  <div
+                    className={item.color}
+                    style={{
+                      width:
+                        item.total > 0 ? `${(item.graded / item.total) * 100}%` : '0%',
+                    }}
+                  />
+                  <div className="bg-zinc-800 flex-1" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Aspect Ratio Distribution */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-zinc-200">Aspect Ratio Distribution</h3>
+          <div className="space-y-2">
+            {ratioDistribution.map((item) => (
+              <div key={item.ratio} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-zinc-300">{item.ratio}</span>
+                  <span className="text-zinc-500">
+                    {item.count} ({item.percent}%)
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+                  <div
+                    className="bg-indigo-500 h-full"
+                    style={{ width: `${item.percent}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Category Breakdown */}
+        {categoryBreakdown.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-zinc-200">Category Breakdown</h3>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {categoryBreakdown.map((cat) => (
+                <div
+                  key={cat.name}
+                  className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-center"
+                >
+                  <div className="text-lg font-bold text-zinc-100">{cat.count}</div>
+                  <div className="text-[10px] text-zinc-500 truncate">{cat.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
