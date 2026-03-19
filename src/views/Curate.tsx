@@ -43,6 +43,7 @@ export function Curate() {
   const [trimIn, setTrimIn] = useState<number | null>(null);
   const [trimOut, setTrimOut] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [notes, setNotes] = useState<string>('');
 
   useEffect(() => {
     setActiveTab('curate');
@@ -68,6 +69,7 @@ export function Curate() {
       setTrimIn(firstPendingClip.trim_in);
       setTrimOut(firstPendingClip.trim_out);
       setSelectedTags(firstPendingClip.tags || []);
+      setNotes(firstPendingClip.curation_note || '');
       setColourGrade(firstPendingClip.colour_grade || COLOUR_GRADE_PRESETS.Original);
       setActivePreset(firstPendingClip.colour_grade ? 'Custom' : 'Original');
     }
@@ -122,6 +124,9 @@ export function Curate() {
       if (trimOut !== null) {
         updateData.trim_out = trimOut;
       }
+      if (notes) {
+        updateData.curation_note = notes;
+      }
 
       const { error } = await supabase
         .from('clips')
@@ -134,6 +139,7 @@ export function Curate() {
         colour_grade: activePreset !== 'Original' ? colourGrade : null,
         trim_in: trimIn,
         trim_out: trimOut,
+        curation_note: notes || null,
       });
 
       if (user && workspace) {
@@ -155,12 +161,20 @@ export function Curate() {
   const handleReject = async () => {
     if (!firstPendingClip) return;
     try {
+      const updateData: Record<string, unknown> = { approved: false, rejected: true };
+      if (notes) {
+        updateData.curation_note = notes;
+      }
       const { error } = await supabase
         .from('clips')
-        .update({ approved: false, rejected: true })
+        .update(updateData)
         .eq('id', firstPendingClip.id);
       if (error) throw error;
-      updateClip(firstPendingClip.id, { approved: false, rejected: true });
+      updateClip(firstPendingClip.id, {
+        approved: false,
+        rejected: true,
+        curation_note: notes || null,
+      });
 
       if (user && workspace) {
         await logActivity(
@@ -240,6 +254,20 @@ export function Curate() {
       updateClip(firstPendingClip.id, { tags: newTags });
     } catch (err) {
       console.error('Failed to update tags:', err);
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({ curation_note: notes })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      updateClip(firstPendingClip.id, { curation_note: notes });
+    } catch (err) {
+      console.error('Failed to update notes:', err);
     }
   };
 
@@ -692,6 +720,18 @@ export function Curate() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* NOTES */}
+                <div className="mt-4">
+                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Notes</div>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    onBlur={() => handleSaveNotes()}
+                    placeholder="Add curation notes..."
+                    className="w-full h-20 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-xs text-zinc-300 placeholder-zinc-600 resize-none focus:outline-none focus:border-zinc-600"
+                  />
                 </div>
               </div>
 

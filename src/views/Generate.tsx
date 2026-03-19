@@ -55,10 +55,17 @@ export function Generate() {
 
   // Calculate clips by type
   const hookCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'hook').length;
+  const hookGradedCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'hook' && c.graded).length;
   const bodyCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'body').length;
+  const bodyGradedCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'body' && c.graded).length;
   const productCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'product').length;
+  const productGradedCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'product' && c.graded).length;
   const ctaCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'cta').length;
+  const ctaGradedCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'cta' && c.graded).length;
   const musicCount = 24;
+
+  // Calculate combo count (approximate): product of counts × format permutations
+  const comboCount = Math.max(1, hookCount * bodyCount * productCount * ctaCount * formats.length * ratios.length);
 
   const personaData = personas.find((p) => p.id === selectedPersona);
   const pillarData = pillars.find((p) => p.id === selectedPillar);
@@ -212,23 +219,23 @@ export function Generate() {
           <div className="flex gap-1.5 flex-wrap">
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-red-400" />
-              <span>Hook: {hookCount}</span>
+              <span>Hook: {hookCount} / {hookGradedCount}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-indigo-500" />
-              <span>Body: {bodyCount}</span>
+              <span>Body: {bodyCount} / {bodyGradedCount}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-amber-500" />
-              <span>Product: {productCount}</span>
+              <span>Product: {productCount} / {productGradedCount}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-teal-400" />
-              <span>CTA: {ctaCount}</span>
+              <span>CTA: {ctaCount} / {ctaGradedCount}</span>
             </div>
           </div>
           <div className="text-[10px] text-zinc-500 mt-2">
-            Music: {musicCount} tracks
+            Music: {musicCount} tracks | Combos: ~{comboCount.toLocaleString()}
           </div>
         </div>
 

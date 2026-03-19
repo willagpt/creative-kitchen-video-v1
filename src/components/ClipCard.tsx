@@ -11,11 +11,20 @@ const TYPE_BADGE_COLORS: Record<string, string> = {
   transition: 'bg-zinc-600',
 };
 
+const SUB_TYPE_BADGE: Record<string, string> = {
+  'food-action': 'bg-orange-500/20 text-orange-400',
+  'food-beauty': 'bg-yellow-500/20 text-yellow-400',
+  'lifestyle': 'bg-purple-500/20 text-purple-400',
+  'product': 'bg-cyan-500/20 text-cyan-400',
+  'stop-motion': 'bg-pink-500/20 text-pink-400',
+};
+
 interface ClipCardProps {
   clip: Clip;
+  manageMode?: boolean;
 }
 
-export function ClipCard({ clip }: ClipCardProps) {
+export function ClipCard({ clip, manageMode = false }: ClipCardProps) {
   const { selectedClips, toggleSelectClip } = useStore();
   const isSelected = selectedClips.has(clip.id);
 
@@ -67,6 +76,8 @@ export function ClipCard({ clip }: ClipCardProps) {
           className={`absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded border flex items-center justify-center transition-opacity ${
             isSelected
               ? 'bg-indigo-500 border-indigo-500 opacity-100'
+              : manageMode
+              ? 'border-zinc-500 bg-black/30 opacity-100'
               : 'border-zinc-500 bg-black/30 opacity-0 group-hover:opacity-100'
           }`}
           onClick={(e) => {
@@ -115,10 +126,17 @@ export function ClipCard({ clip }: ClipCardProps) {
         </div>
       </div>
 
-      {/* Text Area — V1: p-2, 2 lines: text-xs text-zinc-300 + text-[10px] text-zinc-600 */}
+      {/* Text Area — V1: p-2, 2-3 lines depending on sub_type */}
       <div className="p-2">
         <div className="text-xs text-zinc-300 truncate">{clip.name}</div>
-        <div className="text-[10px] text-zinc-600 truncate">{clip.category || 'Uncategorized'}</div>
+        <div className="flex items-center gap-1.5">
+          {clip.sub_type && (
+            <span className={`text-[9px] px-1 rounded ${SUB_TYPE_BADGE[clip.sub_type] || ''}`}>
+              {clip.sub_type}
+            </span>
+          )}
+          <span className="text-[10px] text-zinc-600 truncate">{clip.category || 'Uncategorized'}</span>
+        </div>
       </div>
     </div>
   );

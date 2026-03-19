@@ -28,6 +28,7 @@ export function Shots() {
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [archivedFilter, setArchivedFilter] = useState('');
+  const [manageMode, setManageMode] = useState(false);
 
   useEffect(() => {
     setActiveTab('shots');
@@ -284,7 +285,7 @@ export function Shots() {
 
         {/* Right side: Bulk actions and view controls */}
         <div className="ml-auto flex items-center gap-2">
-          {selectedClips.size > 0 && (
+          {(manageMode || selectedClips.size > 0) && (
             <>
               <span className="text-xs text-indigo-400 font-medium">{selectedClips.size} selected</span>
               <button
@@ -309,7 +310,12 @@ export function Shots() {
             <List className="w-4 h-4" />
           </button>
           <span className="text-xs text-zinc-400 ml-2">{filteredClips.length} clips</span>
-          <button className="text-xs font-medium text-zinc-200 hover:text-white ml-2">Manage</button>
+          <button
+            onClick={() => setManageMode(!manageMode)}
+            className="text-xs font-medium text-zinc-200 hover:text-white ml-2"
+          >
+            {manageMode ? 'Done' : 'Manage'}
+          </button>
         </div>
       </div>
 
@@ -340,7 +346,7 @@ export function Shots() {
             }}
           >
             {filteredClips.map((clip) => (
-              <ClipCard key={clip.id} clip={clip} />
+              <ClipCard key={clip.id} clip={clip} manageMode={manageMode} />
             ))}
           </div>
         )}
