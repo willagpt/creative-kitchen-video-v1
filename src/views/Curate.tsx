@@ -3,6 +3,8 @@ import type { ColourGrade, SubType } from '@/types';
 import { useStore } from '@/store';
 import { supabase } from '@/lib/supabase';
 import { logActivity } from '@/lib/activity';
+import { toast } from '@/components/Toast';
+import { Copy } from 'lucide-react';
 
 const COLOUR_GRADE_PRESETS: Record<string, ColourGrade> = {
   Original: { brightness: 100, contrast: 100, saturate: 100, temperature: 0, shadows: 0 },
@@ -34,8 +36,15 @@ const TAG_CATEGORIES: Record<string, string[]> = {
   'MOOD': ['vibrant', 'warm', 'bright', 'clean', 'natural light'],
 };
 
+interface Segment {
+  id: string;
+  label: string;
+  trim_in: number;
+  trim_out: number;
+}
+
 export function Curate() {
-  const { clips, setActiveTab, updateClip, user, workspace } = useStore();
+  const { clips, setActiveTab, updateClip, user, workspace, fetchClips } = useStore();
   const [clipsLoaded, setClipsLoaded] = useState(false);
   const [showColourPanel, setShowColourPanel] = useState(false);
   const [colourGrade, setColourGrade] = useState<ColourGrade>(COLOUR_GRADE_PRESETS.Original);
@@ -44,6 +53,8 @@ export function Curate() {
   const [trimOut, setTrimOut] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [notes, setNotes] = useState<string>('');
+  const [starRating, setStarRating] = useState(0);
+  const [segments, setSegments] = useState<Segment[]>([]);
 
   useEffect(() => {
     setActiveTab('curate');
@@ -72,8 +83,26 @@ export function Curate() {
       setNotes(firstPendingClip.curation_note || '');
       setColourGrade(firstPendingClip.colour_grade || COLOUR_GRADE_PRESETS.Original);
       setActivePreset(firstPendingClip.colour_grade ? 'Custom' : 'Original');
+      setStarRating(firstPendingClip.star_rating || 0);
     }
   }, [firstPendingClip]);
+
+  // Fetch segments for current clip
+  useEffect(() => {
+    if (!firstPendingClip) {
+      setSegments([]);
+      return;
+    }
+    const fetchSegments = async () => {
+      const { data } = await supabase
+        .from('clip_segments')
+        .select('*')
+        .eq('clip_id', firstPendingClip.id)
+        .order('trim_in');
+      setSegments((data as Segment[]) || []);
+    };
+    fetchSegments();
+  }, [firstPendingClip?.id]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -235,6 +264,139 @@ export function Curate() {
   const handlePreviewTrim = () => {
     // Placeholder for preview trim functionality
     console.log('Preview trim:', { trimIn, trimOut });
+  };
+
+  const handleStarRating = async (rating: number) => {
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({ star_rating: rating })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      setStarRating(rating);
+      updateClip(firstPendingClip.id, { star_rating: rating });
+    } catch (err) {
+      console.error('Failed to update star rating:', err);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (!firstPendingClip || !workspace) return;
+    try {
+      const { data } = await supabase
+        .from('clips')
+        .insert({
+          ...firstPendingClip,
+          id: undefined,
+          name: `${firstPendingClip.name} (copy)`,
+          approved: false,
+          rejected: false,
+          curation_note: `Duplicate of ${firstPendingClip.name}`,
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+      if (data) {
+        await fetchClips(workspace.id);
+        toast('success', `Duplicated: ${firstPendingClip.name}`);
+      }
+    } catch (err) {
+      console.error('Failed to duplicate clip:', err);
+      toast('error', 'Failed to duplicate clip');
+    }
+  };
+
+  const handleReset = async () => {
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({
+          approved: false,
+          rejected: false,
+          trim_in: null,
+          trim_out: null,
+          colour_grade: null,
+          tags: [],
+          curation_note: null,
+        })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      updateClip(firstPendingClip.id, {
+        approved: false,
+        rejected: false,
+        trim_in: null,
+        trim_out: null,
+        colour_grade: null,
+        tags: [],
+        curation_note: null,
+      });
+      setTrimIn(null);
+      setTrimOut(null);
+      setSelectedTags([]);
+      setNotes('');
+      setColourGrade(COLOUR_GRADE_PRESETS.Original);
+      setActivePreset('Original');
+      toast('success', 'Curation reset');
+    } catch (err) {
+      console.error('Failed to reset curation:', err);
+      toast('error', 'Failed to reset curation');
+    }
+  };
+
+  const handleAddSegment = async () => {
+    if (!firstPendingClip || !workspace || !user) return;
+    try {
+      const { data } = await supabase
+        .from('clip_segments')
+        .insert({
+          clip_id: firstPendingClip.id,
+          workspace_id: workspace.id,
+          label: `Segment ${segments.length + 1}`,
+          trim_in: trimIn ?? 0,
+          trim_out: trimOut ?? firstPendingClip.duration,
+          created_by: user.id,
+        })
+        .select()
+        .single();
+      if (data) {
+        setSegments([...segments, data as Segment]);
+        toast('success', 'Segment created');
+      }
+    } catch (err) {
+      console.error('Failed to create segment:', err);
+      toast('error', 'Failed to create segment');
+    }
+  };
+
+  const handleDeleteSegment = async (segId: string) => {
+    try {
+      const { error } = await supabase
+        .from('clip_segments')
+        .delete()
+        .eq('id', segId);
+      if (error) throw error;
+      setSegments(segments.filter((s) => s.id !== segId));
+      toast('success', 'Segment deleted');
+    } catch (err) {
+      console.error('Failed to delete segment:', err);
+      toast('error', 'Failed to delete segment');
+    }
+  };
+
+  const handleUpdateSegmentLabel = async (segId: string, newLabel: string) => {
+    try {
+      const { error } = await supabase
+        .from('clip_segments')
+        .update({ label: newLabel })
+        .eq('id', segId);
+      if (error) throw error;
+      setSegments(segments.map((s) => (s.id === segId ? { ...s, label: newLabel } : s)));
+    } catch (err) {
+      console.error('Failed to update segment label:', err);
+      toast('error', 'Failed to update segment');
+    }
   };
 
   const handleTagToggle = async (tag: string) => {
@@ -733,28 +895,104 @@ export function Curate() {
                     className="w-full h-20 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-xs text-zinc-300 placeholder-zinc-600 resize-none focus:outline-none focus:border-zinc-600"
                   />
                 </div>
+
+                {/* STAR RATING */}
+                <div className="mt-4">
+                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Rating</div>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => handleStarRating(star)}
+                        className={`text-lg transition-colors ${
+                          starRating >= star ? 'text-amber-500' : 'text-zinc-700 hover:text-zinc-500'
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                    {starRating > 0 && (
+                      <button onClick={() => handleStarRating(0)} className="text-[10px] text-zinc-600 hover:text-zinc-400 ml-2">
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* SEGMENTS */}
+                <div className="mt-4">
+                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Segments</div>
+                  <div className="space-y-2">
+                    {segments.length > 0 && (
+                      <div className="space-y-2 mb-3">
+                        {segments.map((seg) => (
+                          <div key={seg.id} className="flex items-center gap-2 p-2 bg-zinc-800/50 rounded border border-zinc-700">
+                            <input
+                              type="text"
+                              value={seg.label}
+                              onChange={(e) => handleUpdateSegmentLabel(seg.id, e.target.value)}
+                              className="flex-1 px-2 py-1 bg-zinc-800 border border-zinc-700 rounded text-xs text-zinc-300 focus:outline-none focus:border-zinc-600"
+                            />
+                            <span className="text-[10px] text-zinc-500">
+                              {seg.trim_in.toFixed(1)}s - {seg.trim_out.toFixed(1)}s
+                            </span>
+                            <button
+                              onClick={() => handleDeleteSegment(seg.id)}
+                              className="text-xs text-zinc-600 hover:text-red-400 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      onClick={handleAddSegment}
+                      className="w-full px-2 py-1.5 text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded border border-zinc-700 transition-colors"
+                    >
+                      + Segment
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Action buttons */}
-              <div className="flex gap-2 justify-center">
-                <button
-                  onClick={handleApprove}
-                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-colors"
-                >
-                  Approve <span className="text-xs ml-1 text-emerald-200">[A]</span>
-                </button>
-                <button
-                  onClick={handleReject}
-                  className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
-                >
-                  Reject <span className="text-xs ml-1 text-zinc-500">[R]</span>
-                </button>
-                <button
-                  onClick={handleSkip}
-                  className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
-                >
-                  Skip <span className="text-xs ml-1 text-zinc-500">[S]</span>
-                </button>
+              <div className="space-y-2">
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={handleApprove}
+                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-colors"
+                  >
+                    Approve <span className="text-xs ml-1 text-emerald-200">[A]</span>
+                  </button>
+                  <button
+                    onClick={handleReject}
+                    className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+                  >
+                    Reject <span className="text-xs ml-1 text-zinc-500">[R]</span>
+                  </button>
+                  <button
+                    onClick={handleSkip}
+                    className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+                  >
+                    Skip <span className="text-xs ml-1 text-zinc-500">[S]</span>
+                  </button>
+                </div>
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={handleDuplicate}
+                    className="px-4 py-2.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Copy className="w-4 h-4" />
+                    Duplicate
+                  </button>
+                  <button
+                    onClick={handleReset}
+                    className="px-4 py-2.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+                  >
+                    Reset
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
