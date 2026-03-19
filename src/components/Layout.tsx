@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
+import { supabase } from '@/lib/supabase';
 import { Settings } from 'lucide-react';
 
 const navItems = [
@@ -14,12 +15,18 @@ const navItems = [
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { activeTab, setActiveTab, user, clips } = useStore();
+  const { activeTab, setActiveTab, user, clips, signOut } = useStore();
   const navigate = useNavigate();
 
   const handleNav = (item: typeof navItems[0]) => {
     setActiveTab(item.id);
     navigate(item.path);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    signOut();
+    navigate('/login');
   };
 
   const handleStaticToolClick = () => {
@@ -88,7 +95,7 @@ export function Layout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Right: Asset count, Settings, Avatar, Static Tool */}
+        {/* Right: Asset count, Settings, Avatar, Static Tool, Sign Out */}
         <div className="flex items-center gap-3">
           <span className="text-[11px] text-zinc-500">{clips.length} assets</span>
           <button className="text-zinc-500 hover:text-zinc-300 transition-colors p-0.5">
@@ -102,6 +109,12 @@ export function Layout({ children }: { children: ReactNode }) {
             className="px-3 py-1 rounded-md text-[11px] font-medium border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-colors"
           >
             Static Tool
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="px-3 py-1 rounded-md text-[11px] font-medium border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-colors"
+          >
+            Sign Out
           </button>
         </div>
       </header>

@@ -61,9 +61,6 @@ export function Recipes() {
     setActiveTab('recipes');
   }, [setActiveTab]);
 
-  const _selectedRecipe = recipes.find((r) => r.id === selectedRecipeId);
-  void _selectedRecipe; // Used for future recipe display
-
   const handleSelectRecipe = (id: string) => {
     const recipe = recipes.find((r) => r.id === id);
     if (recipe) {

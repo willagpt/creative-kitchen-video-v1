@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '@/store';
+import { supabase } from '@/lib/supabase';
 
 export function Curate() {
-  const { clips, setActiveTab } = useStore();
+  const { clips, setActiveTab, updateClip } = useStore();
   const [clipsLoaded, setClipsLoaded] = useState(false);
 
   useEffect(() => {
@@ -21,6 +22,38 @@ export function Curate() {
 
   // Get first pending clip for display
   const firstPendingClip = clips.find((c) => !c.approved && !c.rejected && !c.archived);
+
+  const handleApprove = async () => {
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({ approved: true, rejected: false })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      updateClip(firstPendingClip.id, { approved: true, rejected: false });
+    } catch (err) {
+      console.error('Failed to approve clip:', err);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!firstPendingClip) return;
+    try {
+      const { error } = await supabase
+        .from('clips')
+        .update({ approved: false, rejected: true })
+        .eq('id', firstPendingClip.id);
+      if (error) throw error;
+      updateClip(firstPendingClip.id, { approved: false, rejected: true });
+    } catch (err) {
+      console.error('Failed to reject clip:', err);
+    }
+  };
+
+  const handleSkip = () => {
+    // Skip just moves to next pending clip (UI rerender handles this)
+  };
 
   const TabButton = ({
     label,
@@ -200,13 +233,22 @@ export function Curate() {
 
             {/* Action buttons */}
             <div className="flex gap-2 justify-center">
-              <button className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-colors">
+              <button
+                onClick={handleApprove}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-colors"
+              >
                 Approve
               </button>
-              <button className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors">
+              <button
+                onClick={handleReject}
+                className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+              >
                 Reject
               </button>
-              <button className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors">
+              <button
+                onClick={handleSkip}
+                className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+              >
                 Skip
               </button>
             </div>

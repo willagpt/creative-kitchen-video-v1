@@ -7,6 +7,7 @@ interface AppState {
   // Auth
   user: User | null;
   setUser: (user: User | null) => void;
+  signOut: () => void;
 
   // Workspace
   workspace: Workspace | null;
@@ -67,9 +68,14 @@ const defaultFilters: FilterState = {
   ratio: '',
 };
 
-export const useStore = create<AppState>((set, get) => ({
+export const useStore = create<AppState>((set) => ({
   user: null,
   setUser: (user) => set({ user }),
+  signOut: () => set({
+    user: null,
+    workspace: null,
+    clips: [],
+  }),
 
   workspace: null,
   setWorkspace: (workspace) => set({ workspace }),
@@ -121,8 +127,7 @@ export const useStore = create<AppState>((set, get) => ({
   setColumnCount: (columnCount) => set({ columnCount }),
 
   fetchClips: async (workspaceId: string) => {
-    const { setClips, setLoading } = get();
-    setLoading(true);
+    set((state) => ({ ...state, loading: true }));
     try {
       const { data, error } = await supabase
         .from('clips')
@@ -131,11 +136,10 @@ export const useStore = create<AppState>((set, get) => ({
         .order('name', { ascending: true });
 
       if (error) throw error;
-      setClips((data as Clip[]) || []);
+      set({ clips: (data as Clip[]) || [], loading: false });
     } catch (err) {
       console.error('Failed to fetch clips:', err);
-    } finally {
-      setLoading(false);
+      set({ loading: false });
     }
   },
 }));

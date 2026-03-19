@@ -7,7 +7,7 @@ interface StrategyOption {
 }
 
 export function Generate() {
-  const { setActiveTab } = useStore();
+  const { clips, setActiveTab } = useStore();
 
   // Static demo data
   const personas: StrategyOption[] = [
@@ -52,6 +52,13 @@ export function Generate() {
   useEffect(() => {
     setActiveTab('generate');
   }, [setActiveTab]);
+
+  // Calculate clips by type
+  const hookCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'hook').length;
+  const bodyCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'body').length;
+  const productCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'product').length;
+  const ctaCount = clips.filter((c) => (c.type || 'body').toLowerCase() === 'cta').length;
+  const musicCount = 24;
 
   const personaData = personas.find((p) => p.id === selectedPersona);
   const pillarData = pillars.find((p) => p.id === selectedPillar);
@@ -205,26 +212,23 @@ export function Generate() {
           <div className="flex gap-1.5 flex-wrap">
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-red-400" />
-              <span>Hook: 12</span>
+              <span>Hook: {hookCount}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-indigo-500" />
-              <span>Body: 28</span>
+              <span>Body: {bodyCount}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-amber-500" />
-              <span>Product: 8</span>
+              <span>Product: {productCount}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <div className="w-2 h-2 rounded-full bg-teal-400" />
-              <span>CTA: 4</span>
+              <span>CTA: {ctaCount}</span>
             </div>
           </div>
           <div className="text-[10px] text-zinc-500 mt-2">
-            Music: 3 tracks
-          </div>
-          <div className="text-[10px] text-zinc-600">
-            ~120 possible combos
+            Music: {musicCount} tracks
           </div>
         </div>
 

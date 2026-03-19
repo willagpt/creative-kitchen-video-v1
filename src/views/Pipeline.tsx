@@ -96,7 +96,13 @@ export function Pipeline() {
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours === 0) return `${minutes}m`;
     return `${hours}h ${minutes}m`;
+  };
+
+  const formatSize = (mb: number) => {
+    const gb = mb / 1024;
+    return `${gb.toFixed(1)}GB`;
   };
 
   return (
@@ -108,7 +114,7 @@ export function Pipeline() {
           <StatCard label="Music Tracks" value={stats.musicTracks} />
           <StatCard label="Graphics" value={stats.graphics} />
           <StatCard label="Total Duration" value={formatDuration(stats.totalDuration)} />
-          <StatCard label="Total Size" value={stats.totalSize.toFixed(1)} unit="MB" />
+          <StatCard label="Total Size" value={formatSize(stats.totalSize)} />
         </div>
 
         {/* Grading Status */}
