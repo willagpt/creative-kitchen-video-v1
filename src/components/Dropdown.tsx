@@ -34,10 +34,10 @@ export function Dropdown({ value, onChange, options, placeholder }: DropdownProp
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-zinc-800 bg-zinc-900 text-[12px] text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/50 cursor-pointer transition-colors"
+        className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors whitespace-nowrap"
       >
         {selectedLabel}
-        <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
+        <ChevronDown className="w-3 h-3 text-zinc-600" />
       </button>
 
       {/* Dropdown Panel */}
