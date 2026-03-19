@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
-import { supabase } from '@/lib/supabase';
-import { LogOut } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 const navItems = [
   { id: 'shots', label: 'Shots', path: '/shots', step: '1', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
@@ -15,29 +14,13 @@ const navItems = [
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
-  const {
-    activeTab,
-    setActiveTab,
-    user,
-    showCuratedOnly,
-    setShowCuratedOnly,
-    showGradedOnly,
-    setShowGradedOnly,
-    showMusic,
-    setShowMusic,
-    columnCount,
-    setColumnCount,
-  } = useStore();
+  const { activeTab, setActiveTab, user, clips } = useStore();
   const navigate = useNavigate();
 
   const handleNav = (item: typeof navItems[0]) => {
     if (item.disabled) return;
     setActiveTab(item.id);
     navigate(item.path);
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
   };
 
   const handleStaticToolClick = () => {
@@ -47,8 +30,11 @@ export function Layout({ children }: { children: ReactNode }) {
     }
   };
 
+  const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : '?';
+
   return (
     <div className="h-screen flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+      {/* HEADER */}
       <header className="h-11 flex items-center justify-between px-4 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex-shrink-0">
         {/* Left: Brand */}
         <div className="flex items-center gap-3">
@@ -106,71 +92,20 @@ export function Layout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Right: Controls & User */}
-        <div className="flex items-center gap-2">
-          {/* Checkboxes */}
-          <label className="flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-300 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors">
-            <input
-              type="checkbox"
-              checked={showCuratedOnly}
-              onChange={(e) => setShowCuratedOnly(e.target.checked)}
-              className="w-4 h-4 rounded border-zinc-600 cursor-pointer"
-            />
-            <span>Curated only</span>
-          </label>
-
-          <label className="flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-300 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors">
-            <input
-              type="checkbox"
-              checked={showGradedOnly}
-              onChange={(e) => setShowGradedOnly(e.target.checked)}
-              className="w-4 h-4 rounded border-zinc-600 cursor-pointer"
-            />
-            <span>Graded only</span>
-          </label>
-
-          <label className="flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-300 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors">
-            <input
-              type="checkbox"
-              checked={showMusic}
-              onChange={(e) => setShowMusic(e.target.checked)}
-              className="w-4 h-4 rounded border-zinc-600 cursor-pointer"
-            />
-            <span>Music</span>
-          </label>
-
-          {/* Column slider */}
-          <div className="flex items-center gap-1 px-2">
-            <label className="text-[10px] text-zinc-400">Cols:</label>
-            <input
-              type="range"
-              min="2"
-              max="10"
-              value={columnCount}
-              onChange={(e) => setColumnCount(parseInt(e.target.value, 10))}
-              className="w-16 h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-indigo-500"
-            />
-            <span className="text-[10px] text-zinc-400 w-5 text-right">{columnCount}</span>
+        {/* Right: Asset count, Settings, Avatar, Static Tool */}
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] text-zinc-500">{clips.length} assets</span>
+          <button className="text-zinc-500 hover:text-zinc-300 transition-colors p-0.5">
+            <Settings className="w-4 h-4" />
+          </button>
+          <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">
+            {userInitial}
           </div>
-
-          {/* Static Tool button */}
           <button
             onClick={handleStaticToolClick}
-            className="inline-flex gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-medium bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 hover:bg-yellow-600/20 transition-colors"
+            className="px-3 py-1 rounded-md text-[11px] font-medium border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-colors"
           >
             Static Tool
-          </button>
-
-          {/* User controls */}
-          <span className="text-[10px] text-zinc-500 max-w-[140px] truncate">
-            {user?.email}
-          </span>
-          <button
-            onClick={handleSignOut}
-            className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors p-1"
-            title="Sign out"
-          >
-            <LogOut className="w-3 h-3" />
           </button>
         </div>
       </header>
@@ -179,6 +114,20 @@ export function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1 overflow-auto">
         {children}
       </main>
+
+      {/* BOTTOM BAR */}
+      <footer className="h-8 border-t border-zinc-800 bg-zinc-900/50 flex items-center justify-between px-4 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-[10px] text-zinc-500">Auto-push on</span>
+          <button className="text-[10px] px-2 py-0.5 rounded border border-emerald-600/30 bg-emerald-600/10 text-emerald-400 hover:bg-emerald-600/20 transition-colors">
+            Pull from cloud
+          </button>
+        </div>
+        <span className="text-[10px] text-zinc-600">
+          Creative Kitchen — Big Tasty Productions © 2026
+        </span>
+      </footer>
     </div>
   );
 }

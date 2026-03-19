@@ -117,7 +117,7 @@ export const useStore = create<AppState>((set, get) => ({
   setShowGradedOnly: (showGradedOnly) => set({ showGradedOnly }),
   showMusic: false,
   setShowMusic: (showMusic) => set({ showMusic }),
-  columnCount: 6,
+  columnCount: 8,
   setColumnCount: (columnCount) => set({ columnCount }),
 
   fetchClips: async (workspaceId: string) => {
