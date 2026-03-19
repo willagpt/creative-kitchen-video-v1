@@ -57,6 +57,20 @@ interface AppState {
 
   // Fetch clips from Supabase
   fetchClips: (workspaceId: string) => Promise<void>;
+
+  // Performance feedback for re-iteration
+  reiterateContext: {
+    adName: string;
+    originalRoas: number;
+    status: string;
+    suggestions: string[];
+  } | null;
+  setReiterateContext: (ctx: {
+    adName: string;
+    originalRoas: number;
+    status: string;
+    suggestions: string[];
+  } | null) => void;
 }
 
 const defaultFilters: FilterState = {
@@ -142,4 +156,7 @@ export const useStore = create<AppState>((set) => ({
       set({ loading: false });
     }
   },
+
+  reiterateContext: null,
+  setReiterateContext: (reiterateContext) => set({ reiterateContext }),
 }));

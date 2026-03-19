@@ -7,7 +7,7 @@ interface StrategyOption {
 }
 
 export function Generate() {
-  const { clips, setActiveTab } = useStore();
+  const { clips, setActiveTab, reiterateContext, setReiterateContext } = useStore();
 
   // Static demo data
   const personas: StrategyOption[] = [
@@ -314,17 +314,43 @@ export function Generate() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center px-6 max-w-md">
-          <h2 className="text-lg font-semibold text-zinc-100 mb-3">
-            Strategy-Driven Generation
-          </h2>
-          <p className="text-[12px] text-zinc-400 leading-relaxed">
-            Select your target persona, content pillar, and ad format on the left.
-            Each variation follows the AIDA framework with auto-generated text
-            overlays, enforced action-to-static shot ratios, and persona-aligned
-            clip selection.
-          </p>
+      <div className="flex-1 overflow-auto flex flex-col bg-zinc-950">
+        {reiterateContext && (
+          <div className="mx-4 mt-4 p-4 bg-amber-600/10 border border-amber-600/30 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-amber-400 text-sm font-semibold">Re-iterating: {reiterateContext.adName}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/20 text-red-400">
+                  {reiterateContext.originalRoas.toFixed(1)}x ROAS — {reiterateContext.status}
+                </span>
+              </div>
+              <button onClick={() => setReiterateContext(null)} className="text-zinc-500 hover:text-zinc-300 text-xs">
+                Dismiss
+              </button>
+            </div>
+            <div className="text-[11px] text-zinc-400 mb-2">Performance insights suggest:</div>
+            <ul className="space-y-1">
+              {reiterateContext.suggestions.map((s, i) => (
+                <li key={i} className="text-[11px] text-zinc-300 flex items-start gap-2">
+                  <span className="text-amber-400 shrink-0">→</span> {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center px-6 max-w-md">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-3">
+              Strategy-Driven Generation
+            </h2>
+            <p className="text-[12px] text-zinc-400 leading-relaxed">
+              Select your target persona, content pillar, and ad format on the left.
+              Each variation follows the AIDA framework with auto-generated text
+              overlays, enforced action-to-static shot ratios, and persona-aligned
+              clip selection.
+            </p>
+          </div>
         </div>
       </div>
     </div>

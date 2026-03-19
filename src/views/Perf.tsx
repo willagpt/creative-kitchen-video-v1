@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
 
 interface AdPerformanceData {
@@ -39,11 +40,42 @@ interface ABTestData {
 }
 
 export function Perf() {
-  const { setActiveTab } = useStore();
+  const { setActiveTab, setReiterateContext } = useStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setActiveTab('perf');
   }, [setActiveTab]);
+
+  const handleReiterate = (ad: AdPerformanceData) => {
+    const roas = ad.roas;
+    const tier = roas >= 50 ? 'WINNER' : roas >= 30 ? 'ITERATE' : roas >= 15 ? 'REWORK' : 'KILL';
+
+    let suggestions: string[] = [];
+    if (tier === 'REWORK') {
+      suggestions = [
+        'Try a different hook — current hook CTR is below average',
+        'Keep the body shots — they\'re performing well',
+        'Consider a stronger CTA with urgency',
+      ];
+    } else if (tier === 'KILL') {
+      suggestions = [
+        'Complete creative refresh needed — start with a new hook style',
+        'Test different body shot sub-types (food-beauty performs 2x better than lifestyle)',
+        'Switch to a winning music track (The Trumpet Dude has highest ROAS)',
+        'Consider a different target persona',
+      ];
+    }
+
+    setReiterateContext({
+      adName: ad.name,
+      originalRoas: ad.roas,
+      status: tier,
+      suggestions,
+    });
+
+    navigate('/generate');
+  };
 
   const performanceStats = {
     totalSpend: 192,
@@ -195,20 +227,33 @@ export function Perf() {
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-zinc-200">Ad Performance</h3>
             <div className="space-y-2 max-h-72 overflow-y-auto">
-              {roasBarData.map((ad) => (
-                <div key={ad.name} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-zinc-300 truncate">{ad.name}</div>
-                      <div className="text-[10px] text-zinc-500">${ad.spend} spent</div>
+              {roasBarData.map((ad) => {
+                const tier = ad.roas >= 50 ? 'WINNER' : ad.roas >= 30 ? 'ITERATE' : ad.roas >= 15 ? 'REWORK' : 'KILL';
+                return (
+                  <div key={ad.name} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-zinc-300 truncate">{ad.name}</div>
+                        <div className="text-[10px] text-zinc-500">${ad.spend} spent</div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className={`px-2 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap ${ad.badgeColor}`}>
+                          {ad.badge}
+                        </div>
+                        {(tier === 'REWORK' || tier === 'KILL') && (
+                          <button
+                            onClick={() => handleReiterate(ad)}
+                            className="text-[10px] px-2 py-0.5 rounded border border-indigo-500/30 bg-indigo-600/10 text-indigo-400 hover:bg-indigo-600/20 transition-colors whitespace-nowrap"
+                          >
+                            Re-iterate
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className={`px-2 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap flex-shrink-0 ${ad.badgeColor}`}>
-                      {ad.badge}
-                    </div>
+                    <div className="text-sm font-bold text-zinc-100">{ad.roas.toFixed(1)}x</div>
                   </div>
-                  <div className="text-sm font-bold text-zinc-100">{ad.roas.toFixed(1)}x</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -381,6 +426,72 @@ export function Perf() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* WINNING PATTERNS */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mt-4">
+          <h3 className="text-sm font-semibold text-zinc-100 mb-3">Winning Patterns</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {/* Best Hooks */}
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Top Hooks</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Unboxing reveal</span>
+                  <span className="text-xs text-emerald-400 font-mono">4.2% CTR</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Food close-up</span>
+                  <span className="text-xs text-emerald-400 font-mono">3.8% CTR</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Chef action</span>
+                  <span className="text-xs text-zinc-400 font-mono">2.1% CTR</span>
+                </div>
+              </div>
+            </div>
+            {/* Best Body Types */}
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Top Body Types</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Food beauty shots</span>
+                  <span className="text-xs text-emerald-400 font-mono">38.2x ROAS</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Lifestyle scenes</span>
+                  <span className="text-xs text-zinc-400 font-mono">22.1x ROAS</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Stop motion</span>
+                  <span className="text-xs text-zinc-400 font-mono">15.4x ROAS</span>
+                </div>
+              </div>
+            </div>
+            {/* Best Music */}
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Top Music Tracks</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">The Trumpet Dude</span>
+                  <span className="text-xs text-emerald-400 font-mono">42.1x ROAS</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Casserole Original</span>
+                  <span className="text-xs text-zinc-400 font-mono">28.3x ROAS</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-300">Mister V</span>
+                  <span className="text-xs text-zinc-400 font-mono">19.7x ROAS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-zinc-800">
+            <div className="text-[10px] text-zinc-500">
+              <span className="text-emerald-400 font-medium">Recommendation:</span> Combine unboxing hooks + food beauty body shots + The Trumpet Dude music for highest predicted ROAS
+            </div>
           </div>
         </div>
       </div>
