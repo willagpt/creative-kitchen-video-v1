@@ -1,13 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Creative Kitchen — Video | Big Tasty Productions</title>
+    <script type="module" crossorigin src="/assets/index-DGpKpfRH.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CS7RNIiG.css">
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script src="/asset_data.js"></script>
+    <script>
+      if (typeof ASSET_DATA !== 'undefined') {
+        window.ASSET_DATA = ASSET_DATA;
+      }
+    </script>
+    <!-- Static Tool link + PIN -->
+    <div id="ck-pin" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);justify-content:center;align-items:center;">
+      <div style="background:#18181b;border:1px solid #333;border-radius:12px;padding:32px;text-align:center;font-family:inherit;min-width:280px;">
+        <div style="font-size:13px;font-weight:600;color:#e4e4e7;margin-bottom:4px">Static Tool Access</div>
+        <div style="color:#71717a;font-size:12px;margin-bottom:16px">Enter PIN to continue</div>
+        <input id="ck-pin-in" type="password" maxlength="4" placeholder="••••" style="width:120px;padding:10px;text-align:center;font-size:24px;letter-spacing:8px;background:#09090b;border:1px solid #3f3f46;border-radius:8px;color:white;outline:none"/>
+        <div id="ck-pin-err" style="color:#ef4444;font-size:11px;margin-top:8px;display:none">Incorrect PIN</div>
+        <div style="margin-top:16px"><button onclick="document.getElementById('ck-pin').style.display='none'" style="padding:6px 20px;background:transparent;border:1px solid #3f3f46;border-radius:6px;color:#71717a;font-size:12px;cursor:pointer">Cancel</button></div>
+      </div>
+    </div>
+    <script>
+    (function(){
+      document.getElementById('ck-pin').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
+      document.getElementById('ck-pin-in').addEventListener('keyup',function(){
+        if(this.value==='2708'){window.open('https://creative-kitchen-static.vercel.app/','_blank');document.getElementById('ck-pin').style.display='none';}
+        else if(this.value.length===4){document.getElementById('ck-pin-err').style.display='block';this.value='';}
+      });
+      setInterval(function(){
+        try{
+          if(document.getElementById('ck-static-btn'))return;
+          var h=document.querySelector('header');if(!h)return;
+          var r=h.children[h.children.length-1];if(!r)return;
+          var b=document.createElement('a');b.id='ck-static-btn';b.href='#';
+          b.onclick=function(e){e.preventDefault();var m=document.getElementById('ck-pin');m.style.display='flex';var i=document.getElementById('ck-pin-in');i.value='';document.getElementById('ck-pin-err').style.display='none';setTimeout(function(){i.focus();},100);};
+          b.style.cssText='display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(234,179,8,.08);color:#ca8a04;font-size:11px;font-weight:500;text-decoration:none;border:1px solid rgba(234,179,8,.15);white-space:nowrap;margin-left:4px;cursor:pointer;';
+          b.textContent='Static Tool';
+          r.appendChild(b);
+        }catch(e){}
+      },3000);
+    })();
+    </script>
+    <script src="/assets/ck-sync.js?v=4"></script>
+    <script src="/assets/ck-grader.js?v=7"></script>
+    <script src="/assets/ck-subtypes.js?v=5"></script>
   </body>
 </html>
