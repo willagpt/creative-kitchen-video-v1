@@ -178,8 +178,8 @@ export function Shots() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* STATS BAR */}
-      <div className="px-2 py-1 flex items-center gap-3 bg-zinc-950 shrink-0 text-[11px]">
+      {/* STATS BAR — V1: px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 */}
+      <div className="flex gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 overflow-x-auto shrink-0">
         <div className="flex items-center gap-2 text-[11px]">
           <span className="text-zinc-300 font-medium">Total</span>
           <span className="text-zinc-100 font-bold">{clips.length}</span>
@@ -211,14 +211,14 @@ export function Shots() {
         </div>
       </div>
 
-      {/* FILTER BAR */}
-      <div className="px-2 py-1 flex items-center gap-2 bg-zinc-950 shrink-0">
+      {/* FILTER BAR — V1: px-4 py-3 border-b border-zinc-800 */}
+      <div className="flex flex-wrap gap-2 px-4 py-3 border-b border-zinc-800 items-center shrink-0">
         <input
           type="text"
           placeholder="Search shots..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-32 px-2 py-1 bg-transparent border-b border-zinc-800 text-[11px] text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
+          className="w-56 h-8 px-3 py-1 bg-zinc-900 border border-zinc-700 rounded-md text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
         />
         <Dropdown
           value={typeFilter}
@@ -259,19 +259,20 @@ export function Shots() {
 
         {/* Right side: View controls and clip count */}
         <div className="ml-auto flex items-center gap-2">
-          <button className="w-7 h-7 rounded bg-indigo-600/80 text-white flex items-center justify-center">
-            <Grid3X3 className="w-3.5 h-3.5" />
+          <button className="w-8 h-8 rounded-md bg-indigo-600 text-white flex items-center justify-center">
+            <Grid3X3 className="w-4 h-4" />
           </button>
-          <button className="w-7 h-7 rounded text-zinc-500 hover:text-zinc-300 flex items-center justify-center">
-            <List className="w-3.5 h-3.5" />
+          <button className="w-8 h-8 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 flex items-center justify-center">
+            <List className="w-4 h-4" />
           </button>
-          <span className="text-[11px] text-zinc-500 ml-1">{filteredClips.length} clips</span>
-          <button className="text-[11px] font-medium text-zinc-300 hover:text-white ml-1">Manage</button>
+          <span className="text-xs text-zinc-400 ml-2">{filteredClips.length} clips</span>
+          <button className="text-xs font-medium text-zinc-200 hover:text-white ml-2">Manage</button>
         </div>
       </div>
 
       {/* GRID CONTENT */}
-      <div className="flex-1 overflow-auto px-0 py-0 bg-zinc-950">
+      {/* GRID AREA — V1: flex-1 overflow-y-auto p-4, grid gap-3 */}
+      <div className="flex-1 overflow-y-auto p-4">
         {clips.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
             <Film className="w-12 h-12 mb-3 text-zinc-700" />
@@ -290,7 +291,7 @@ export function Shots() {
           </div>
         ) : (
           <div
-            className="grid gap-px"
+            className="grid gap-3"
             style={{
               gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
             }}

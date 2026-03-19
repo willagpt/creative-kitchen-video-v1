@@ -44,7 +44,7 @@ export function ClipCard({ clip }: ClipCardProps) {
   const typeBgColor = TYPE_BADGE_COLORS[clipType] || 'bg-zinc-700';
 
   return (
-    <div className="overflow-hidden rounded-lg cursor-pointer transition-all hover:shadow-lg">
+    <div className="group relative bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden cursor-pointer transition-all hover:border-indigo-500/50">
       {/* Thumbnail Area */}
       <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-zinc-700/50 to-zinc-800 rounded-t-lg flex items-center justify-center">
         {/* Faint clip name text */}
@@ -77,13 +77,10 @@ export function ClipCard({ clip }: ClipCardProps) {
         )}
       </div>
 
-      {/* Text Area */}
-      <div className="px-1.5 py-1 bg-zinc-950">
-        <div className="text-[10px] font-medium text-zinc-200 truncate">{clip.name}</div>
-        <div className="text-[9px] text-zinc-500 truncate">{clip.fullname || clip.name}.mp4</div>
-        {clip.category && (
-          <div className="text-[9px] text-zinc-600 uppercase tracking-wider truncate">{clip.category}</div>
-        )}
+      {/* Text Area — V1: p-2, 2 lines: text-xs text-zinc-300 + text-[10px] text-zinc-600 */}
+      <div className="p-2">
+        <div className="text-xs text-zinc-300 truncate">{clip.name}</div>
+        <div className="text-[10px] text-zinc-600 truncate">{clip.category || 'Uncategorized'}</div>
       </div>
     </div>
   );
