@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Film,
   ChevronDown,
+  Check,
 } from 'lucide-react';
 import type { Clip } from '@/types';
 
@@ -21,26 +22,18 @@ function StatsBar({ clips }: { clips: Clip[] }) {
   const rejected = clips.filter((c) => c.rejected).length;
   const pending = total - approved - rejected;
 
-  const types = clips.reduce<Record<string, number>>((acc, c) => {
-    const t = c.type || 'untyped';
-    acc[t] = (acc[t] || 0) + 1;
-    return acc;
-  }, {});
-
   return (
-    <div className="flex items-center gap-4 text-xs text-zinc-400 flex-wrap">
-      <span className="font-medium text-zinc-200">{total} clips</span>
-      <span className="text-green-500">{approved} approved</span>
-      <span className="text-red-500">{rejected} rejected</span>
-      <span className="text-zinc-500">{pending} pending</span>
-      <span className="text-zinc-600">|</span>
-      {Object.entries(types)
-        .sort(([, a], [, b]) => b - a)
-        .map(([type, count]) => (
-          <span key={type} className="text-zinc-500">
-            {type}: {count}
-          </span>
-        ))}
+    <div className="flex items-center gap-2 text-xs text-zinc-500 mt-2">
+      <span className="font-medium text-zinc-300">{total}</span>
+      <span>•</span>
+      <span className="text-green-500 font-medium">{approved}</span>
+      <span className="text-green-600">approved</span>
+      <span>•</span>
+      <span className="text-red-500 font-medium">{rejected}</span>
+      <span className="text-red-600">rejected</span>
+      <span>•</span>
+      <span className="text-zinc-500 font-medium">{pending}</span>
+      <span>pending</span>
     </div>
   );
 }
@@ -181,38 +174,38 @@ export function Shots() {
   }
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-100">Shot Library</h1>
+    <div className="flex flex-col h-full">
+      {/* Header Section */}
+      <div className="border-b border-zinc-800 px-6 py-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex-1">
+            <h1 className="text-xl font-semibold text-zinc-100">Shots</h1>
             <StatsBar clips={filteredClips} />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {selectedClips.size > 0 && (
-              <div className="flex items-center gap-2 mr-4">
-                <span className="text-sm text-indigo-400">
+              <div className="flex items-center gap-2 mr-3 px-2 py-1 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+                <span className="text-xs text-indigo-400 font-medium">
                   {selectedClips.size} selected
                 </span>
                 <button
                   onClick={clearSelection}
-                  className="text-xs text-zinc-500 hover:text-zinc-300"
+                  className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
                 >
-                  Clear
+                  clear
                 </button>
               </div>
             )}
             <button
               onClick={() => selectAllVisible(filteredClips.map((c) => c.id))}
-              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              className="p-2 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
               title="Select all visible"
             >
               <CheckSquare className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              className="p-2 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
               title={viewMode === 'grid' ? 'Switch to list' : 'Switch to grid'}
             >
               {viewMode === 'grid' ? (
@@ -225,16 +218,16 @@ export function Shots() {
         </div>
 
         {/* Filters bar */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px] max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <div className="relative min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
             <input
               type="text"
               value={filters.search}
               onChange={(e) => setFilters({ search: e.target.value })}
-              placeholder="Search clips..."
-              className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
+              placeholder="Search..."
+              className="w-full pl-9 pr-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-md text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -258,29 +251,29 @@ export function Shots() {
             placeholder="Sub-type"
           />
           <FilterSelect
-            value={filters.ratio}
-            onChange={(v) => setFilters({ ratio: v })}
-            options={ratios}
-            placeholder="Ratio"
-          />
-          <FilterSelect
             value={filters.approved}
             onChange={(v) => setFilters({ approved: v as 'all' | 'approved' | 'rejected' | 'pending' })}
             options={['all', 'approved', 'rejected', 'pending']}
             placeholder="Status"
           />
+          <FilterSelect
+            value={filters.ratio}
+            onChange={(v) => setFilters({ ratio: v })}
+            options={ratios}
+            placeholder="Ratio"
+          />
 
           {/* Sort */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 ml-auto">
             <FilterSelect
               value={sortField}
               onChange={(v) => setSortField(v as typeof sortField)}
               options={['name', 'duration', 'size_mb', 'category', 'created_at']}
-              placeholder="Sort by"
+              placeholder="Sort"
             />
             <button
               onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 text-xs"
+              className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 text-xs transition-colors"
             >
               {sortDirection === 'asc' ? '↑' : '↓'}
             </button>
@@ -289,7 +282,7 @@ export function Shots() {
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="flex items-center gap-1 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors"
+              className="flex items-center gap-1 px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 rounded-md transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               Reset
@@ -298,43 +291,45 @@ export function Shots() {
         </div>
       </div>
 
-      {/* Grid */}
-      {filteredClips.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-          {hasActiveFilters ? (
-            <>
-              <XSquare className="w-10 h-10 mb-3 text-zinc-600" />
-              <p className="text-sm">No clips match your filters</p>
-              <button
-                onClick={resetFilters}
-                className="mt-2 text-sm text-indigo-400 hover:text-indigo-300"
-              >
-                Reset filters
-              </button>
-            </>
-          ) : (
-            <>
-              <Film className="w-10 h-10 mb-3 text-zinc-600" />
-              <p className="text-sm">No clips yet</p>
-              <p className="text-xs text-zinc-600 mt-1">
-                Clips will appear here once loaded from Google Drive
-              </p>
-            </>
-          )}
-        </div>
-      ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-          {filteredClips.map((clip) => (
-            <ClipCard key={clip.id} clip={clip} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-1">
-          {filteredClips.map((clip) => (
-            <ClipListRow key={clip.id} clip={clip} thumbnailMap={thumbnailMap} />
-          ))}
-        </div>
-      )}
+      {/* Grid / List Content */}
+      <div className="flex-1 overflow-auto p-6">
+        {filteredClips.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
+            {hasActiveFilters ? (
+              <>
+                <XSquare className="w-12 h-12 mb-3 text-zinc-700" />
+                <p className="text-sm font-medium">No clips match your filters</p>
+                <button
+                  onClick={resetFilters}
+                  className="mt-3 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Reset filters
+                </button>
+              </>
+            ) : (
+              <>
+                <Film className="w-12 h-12 mb-3 text-zinc-700" />
+                <p className="text-sm font-medium">No clips yet</p>
+                <p className="text-xs text-zinc-600 mt-1">
+                  Clips will appear here once loaded from Google Drive
+                </p>
+              </>
+            )}
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {filteredClips.map((clip) => (
+              <ClipCard key={clip.id} clip={clip} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-1.5 max-w-6xl">
+            {filteredClips.map((clip) => (
+              <ClipListRow key={clip.id} clip={clip} thumbnailMap={thumbnailMap} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -356,7 +351,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none pl-3 pr-7 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+        className="appearance-none pl-3 pr-7 py-1.5 bg-zinc-800 border border-zinc-700 rounded-md text-xs text-zinc-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 cursor-pointer transition-colors hover:bg-zinc-700/50"
       >
         <option value="">{placeholder}</option>
         {options.map((opt) => (
@@ -365,7 +360,7 @@ function FilterSelect({
           </option>
         ))}
       </select>
-      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-500 pointer-events-none" />
+      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-600 pointer-events-none" />
     </div>
   );
 }
@@ -390,33 +385,42 @@ function ClipListRow({ clip, thumbnailMap }: { clip: Clip; thumbnailMap: Map<str
   return (
     <div
       onClick={() => toggleSelectClip(clip.id)}
-      className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors border ${
         isSelected
-          ? 'bg-indigo-600/10 border border-indigo-500/30'
-          : 'hover:bg-zinc-900 border border-transparent'
+          ? 'bg-indigo-500/10 border-indigo-500/30'
+          : 'border-transparent hover:bg-zinc-800/50 hover:border-zinc-700'
       }`}
     >
+      {/* Checkbox */}
+      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+        isSelected
+          ? 'bg-indigo-500 border-indigo-500'
+          : 'border-zinc-600 hover:border-zinc-500'
+      }`}>
+        {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+      </div>
+
       {/* Thumbnail */}
-      <div className="w-16 h-9 bg-zinc-800 rounded overflow-hidden shrink-0">
+      <div className="w-14 h-8 bg-gradient-to-br from-zinc-700 to-zinc-800 rounded overflow-hidden shrink-0">
         {thumbUrl ? (
           <img src={thumbUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Film className="w-3 h-3 text-zinc-600" />
+            <Film className="w-2.5 h-2.5 text-zinc-600" />
           </div>
         )}
       </div>
 
       {/* Name */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm text-zinc-200 truncate">{clip.name}</div>
+        <div className="text-sm text-zinc-200 truncate font-medium">{clip.name}</div>
       </div>
 
       {/* Badges */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1.5 shrink-0">
         {clip.sub_type && (
           <span
-            className={`px-1.5 py-0.5 text-[10px] rounded ${
+            className={`px-1.5 py-0.5 text-[10px] rounded-sm font-medium ${
               SUB_TYPE_COLORS[clip.sub_type] || 'bg-zinc-800 text-zinc-400'
             }`}
           >
@@ -424,25 +428,30 @@ function ClipListRow({ clip, thumbnailMap }: { clip: Clip; thumbnailMap: Map<str
           </span>
         )}
         {clip.category && (
-          <span className="px-1.5 py-0.5 bg-zinc-800 text-zinc-500 text-[10px] rounded">
+          <span className="px-1.5 py-0.5 bg-zinc-800 text-zinc-500 text-[10px] rounded-sm">
             {clip.category}
           </span>
         )}
-        <span className="text-xs text-zinc-500 w-12 text-right">
-          {clip.duration > 0 ? `${Math.floor(clip.duration / 60)}:${Math.floor(clip.duration % 60).toString().padStart(2, '0')}` : '—'}
-        </span>
-        <span className="text-xs text-zinc-600 w-14 text-right">
-          {clip.size_mb > 0 ? `${clip.size_mb.toFixed(1)}MB` : ''}
-        </span>
+        {clip.duration > 0 && (
+          <span className="text-xs text-zinc-500 w-11 text-right tabular-nums">
+            {Math.floor(clip.duration / 60)}:{Math.floor(clip.duration % 60).toString().padStart(2, '0')}
+          </span>
+        )}
+        {clip.size_mb > 0 && (
+          <span className="text-xs text-zinc-600 w-14 text-right tabular-nums">
+            {clip.size_mb.toFixed(1)} MB
+          </span>
+        )}
         {/* Status dot */}
         <div
-          className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+          className={`w-2 h-2 rounded-full shrink-0 ${
             clip.approved
               ? 'bg-green-500'
               : clip.rejected
               ? 'bg-red-500'
               : 'bg-zinc-600'
           }`}
+          title={clip.approved ? 'Approved' : clip.rejected ? 'Rejected' : 'Pending'}
         />
       </div>
     </div>
