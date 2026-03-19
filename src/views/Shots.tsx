@@ -12,7 +12,6 @@ export function Shots() {
     workspace,
     fetchClips,
     setThumbnailMap,
-    columnCount,
     setActiveTab,
   } = useStore();
 
@@ -179,7 +178,7 @@ export function Shots() {
   return (
     <div className="flex flex-col h-full">
       {/* STATS BAR — V1: px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 */}
-      <div className="flex gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 overflow-x-auto shrink-0">
+      <div className="flex gap-3 px-4 py-2 border-b border-zinc-800 bg-zinc-900/50 overflow-x-auto shrink-0">
         <div className="flex items-center gap-2 text-[11px]">
           <span className="text-zinc-300 font-medium">Total</span>
           <span className="text-zinc-100 font-bold">{clips.length}</span>
@@ -293,7 +292,7 @@ export function Shots() {
           <div
             className="grid gap-3"
             style={{
-              gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
+              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
             }}
           >
             {filteredClips.map((clip) => (
