@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useStore } from '@/store';
-import { ChefHat, Plus, AlertCircle } from 'lucide-react';
+import { ChefHat, Plus, AlertCircle, LogOut } from 'lucide-react';
+import { toast } from '@/components/Toast';
 import type { Workspace } from '@/types';
 
 export function WorkspaceSetup() {
@@ -74,12 +75,19 @@ export function WorkspaceSetup() {
         .update({ workspace_id: ws.id })
         .is('workspace_id', null);
 
+      toast('success', `Workspace "${ws.name}" created! Loading your clips...`);
       setWorkspace(ws as Workspace);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create workspace');
+      const msg = err instanceof Error ? err.message : 'Failed to create workspace';
+      setError(msg);
+      toast('error', msg);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
   };
 
   if (checking) {
@@ -100,6 +108,9 @@ export function WorkspaceSetup() {
           </div>
           <p className="text-zinc-400 text-sm">
             Create a workspace to start managing your video clips
+          </p>
+          <p className="text-zinc-600 text-xs mt-2">
+            Signed in as {user?.email}
           </p>
         </div>
 
@@ -141,6 +152,14 @@ export function WorkspaceSetup() {
             )}
           </button>
         </form>
+
+        <button
+          onClick={handleSignOut}
+          className="flex items-center justify-center gap-2 mx-auto mt-4 text-sm text-zinc-500 hover:text-red-400 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </button>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { Auth } from '@/views/Auth';
 import { WorkspaceSetup } from '@/views/WorkspaceSetup';
 import { Layout } from '@/components/Layout';
 import { Shots } from '@/views/Shots';
+import { ToastContainer } from '@/components/Toast';
 
 export default function App() {
   const { user, setUser, workspace } = useStore();
@@ -35,7 +36,12 @@ export default function App() {
   }
 
   if (!user) {
-    return <Auth />;
+    return (
+      <>
+        <Auth />
+        <ToastContainer />
+      </>
+    );
   }
 
   if (!workspace) {
@@ -43,12 +49,15 @@ export default function App() {
   }
 
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/shots" replace />} />
-        <Route path="/shots" element={<Shots />} />
-        <Route path="*" element={<Navigate to="/shots" replace />} />
-      </Routes>
-    </Layout>
+    <>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/shots" replace />} />
+          <Route path="/shots" element={<Shots />} />
+          <Route path="*" element={<Navigate to="/shots" replace />} />
+        </Routes>
+      </Layout>
+      <ToastContainer />
+    </>
   );
 }
