@@ -78,12 +78,17 @@ export function ClipCard({ clip }: ClipCardProps) {
       </div>
 
       {/* Text Area */}
-      <div className="p-2 bg-zinc-900">
+      <div className="px-2 py-1.5 bg-zinc-900">
         <div className="text-[11px] font-medium text-zinc-200 truncate">
           {clip.name}
         </div>
+        {clip.fullname && (
+          <div className="text-[10px] text-zinc-400 truncate">
+            {clip.fullname}
+          </div>
+        )}
         {clip.category && (
-          <div className="text-[10px] text-zinc-500 truncate">
+          <div className="text-[9px] text-zinc-500 uppercase tracking-wider truncate">
             {clip.category}
           </div>
         )}
